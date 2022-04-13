@@ -11,7 +11,7 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 #variables
 l_names = [] #list of names
 d_names = {} #dictionary of names
-bot = commands.Bot(command_prefix='#')
+bot = commands.Bot(command_prefix='=')
 
 @bot.command()
 async def hello(ctx):
