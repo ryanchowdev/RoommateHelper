@@ -23,5 +23,6 @@ import weather
 import money
 import schedule
 import alarm
+import help
 
 bot.run(TOKEN)
