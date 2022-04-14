@@ -11,6 +11,7 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 
 #variables
 bot = commands.Bot(command_prefix='=')
+builtins.bot = bot
 
 builtins.bot = bot
 
