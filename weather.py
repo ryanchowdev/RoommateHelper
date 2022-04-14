@@ -67,16 +67,18 @@ async def setUnits(ctx):
     global user_data
     cmd = ctx.message.content.split(" ")
     if len(cmd) != 2:
-        await ctx.reply("Usage:\n`=setUnits (F)ahrenheit OR (C)elsius`")
+        await ctx.reply("Usage:\n`=setUnits (i)mperial OR (m)etric`")
         return
-    unit = cmd[1][0].upper()
-    if unit == 'F' or unit == 'C':
-        user_data['unit'] = unit
-        pickle.dump(user_data, open("user_data.p", "wb"))
-        await ctx.reply("Units set to " + unit)
+    unit = cmd[1][0].lower()
+    if unit == 'i':
+        user_data['unit_sys'] = 'imperial'
+    elif unit == 'm':
+        user_data['unit_sys'] = 'metric'
     else:
-        await ctx.reply("Usage:\n`=setUnits (F)ahrenheit OR (C)elsius`")
+        await ctx.reply("Usage:\n`=setUnits (i)mperial OR (m)etric`")
         return
+    pickle.dump(user_data, open("user_data.p", "wb"))
+    await ctx.reply("Units set to " + user_data['unit_sys'])
 
 
 @bot.command()
