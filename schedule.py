@@ -70,16 +70,11 @@ async def continueSchedule(ctx):
             scheduledMessage.start(ctx,key)
             await ctx.reply(f"Continuing schedule for {key}")
 
-#Not working right now
 @bot.command()
-async def deleteSchedule(ctx,message:str):
-    if os.stat('schedule.pkl').st_size != 0:
-        schedule = load_from_fileSchedule('schedule.pkl')
-        try:
-            del schedule[message]
-            await ctx.reply(f"Deleted {message} {schedule[message][0]} {schedule[message][1]} from schedule")
-        except:
-            await ctx.reply(f"Failed to delete {message}")
+async def clearSchedule(ctx):
+    scheduledMessage.cancel()
+    open("schedule.pkl", "w").close()
+    await ctx.reply(f"All schedules cleared.")
     
 
 @tasks.loop(minutes=1)
