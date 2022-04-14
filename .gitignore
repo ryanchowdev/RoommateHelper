@@ -130,3 +130,5 @@ dmypy.json
 
 # Pickle files
 *.p
+*.pkl
+*.pickle

@@ -49,6 +49,8 @@ async def stop(ctx):
 async def scheduledMessage(ctx,message):
     await ctx.send(message)
 
+# import bot features
 import weather
+import money
 
 bot.run(TOKEN)
