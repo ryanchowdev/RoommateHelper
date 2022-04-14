@@ -3,6 +3,7 @@ import string
 import discord
 from discord.ext import commands, tasks
 from dotenv import load_dotenv
+import builtins
 
 # get token from .env file
 load_dotenv()
@@ -12,6 +13,8 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 l_names = [] #list of names
 d_names = {} #dictionary of names
 bot = commands.Bot(command_prefix='=')
+
+builtins.bot = bot
 
 @bot.command()
 async def hello(ctx):
@@ -45,5 +48,7 @@ async def stop(ctx):
 @tasks.loop(minutes=1)
 async def scheduledMessage(ctx,message):
     await ctx.send(message)
+
+import weather
 
 bot.run(TOKEN)
