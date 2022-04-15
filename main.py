@@ -1,7 +1,7 @@
 import os
-import string
+from re import A
 import discord
-from discord.ext import commands, tasks
+from discord.ext import commands
 from dotenv import load_dotenv
 import builtins
 
@@ -10,20 +10,15 @@ load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
 #variables
+l_names = [] #list of names
+d_names = {} #dictionary of names
 bot = commands.Bot(command_prefix='=')
-builtins.bot = bot
-
 builtins.bot = bot
 
 @bot.command()
 async def hello(ctx):
     await ctx.reply("Hello!")
 
-# import bot features
-import weather
-import money
-import schedule
-import alarm
 import help
 
 bot.run(TOKEN)

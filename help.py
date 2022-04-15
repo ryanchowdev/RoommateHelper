@@ -5,6 +5,8 @@ from discord.ext import commands
 from dotenv import load_dotenv
 from builtins import bot
 
+#bot = commands.Bot(command_prefix='=')
+
 @bot.command()
 async def helper(ctx):
    embed=discord.Embed(
