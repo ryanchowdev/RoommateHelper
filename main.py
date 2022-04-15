@@ -22,5 +22,6 @@ async def hello(ctx):
 import weather
 import money
 import schedule
+import alarm
 
 bot.run(TOKEN)
