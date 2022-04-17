@@ -2,6 +2,7 @@ import os
 import pickle
 from pathlib import Path
 from builtins import bot
+from tracemalloc import start
 from discord.ext import tasks
 
 # Code below take from money.py (Ryan's code I believe)
@@ -45,38 +46,67 @@ async def schedule(ctx, paramOne:str = "m" ,paramTwo:int = 1,message:str = "MSG"
     else:
         await ctx.reply("Unrecognized please use m for minutes, h for hours, d for days instead of " + paramOne)
         return
+
+    messageCode = paramOne+str(time)+message[0]
     if os.stat('schedule.pkl').st_size != 0:
         schedule = load_from_fileSchedule('schedule.pkl')
         for key in schedule:
-            if message == key and schedule[key] == (paramOne,paramTwo):
+            if schedule[key] == [paramOne,time,message,time]:
                 await ctx.reply("Already scheduled please resume or delete instead")
                 return
-    record_schedule(message,(paramOne,paramTwo))
-    scheduledMessage.change_interval(minutes = int(time))
-    scheduledMessage.start(ctx,message)
-    await ctx.reply("Scheduled a message every "+ str(paramTwo)+" "+paramOne)
+    record_schedule(messageCode,[paramOne,time,message,time])
+    await ctx.reply("Scheduled a message every "+ str(paramTwo)+" "+paramOne+" code is " + messageCode)
+    try:
+        scheduledMessage.start(ctx)
+    except:
+        pass
+
+@bot.command()
+async def continueSchedule(ctx):
+    try:
+        if os.stat('schedule.pkl').st_size != 0:
+            scheduledMessage.start(ctx)
+    except:
+        await ctx.reply("No current Schedules")
+
+
+#@bot.command()
+#async def startSchedule(ctx):
+#    try:
+#        await ctx.send("Starting Schedule")
+#        scheduledMessage.start(ctx)
+#    except:
+#        await ctx.send("could not start schedule")
 
 @bot.command()
 async def stopSchedule(ctx):
     scheduledMessage.cancel()
-    await ctx.reply("Stopped message")
-
-@bot.command()
-async def continueSchedule(ctx):
-    if os.stat('schedule.pkl').st_size != 0:
-        schedule = load_from_fileSchedule('schedule.pkl')
-        for key in schedule:
-            scheduledMessage.change_interval(minutes = int(schedule[key][1]))
-            scheduledMessage.start(ctx,key)
-            await ctx.reply(f"Continuing schedule for {key}")
+    await ctx.reply("Stopped schedule(s)")
 
 @bot.command()
 async def clearSchedule(ctx):
     scheduledMessage.cancel()
     open("schedule.pkl", "w").close()
     await ctx.reply(f"All schedules cleared.")
-    
+
+@bot.command()
+async def currentSchedule(ctx):
+    try:
+        if os.stat('schedule.pkl').st_size != 0:
+            schedule = load_from_fileSchedule('schedule.pkl')
+            await ctx.reply("Current schedules:")
+            for key in schedule:
+                await ctx.reply(f"code: {key} msg: {schedule[key][2]}")
+    except:
+        await ctx.reply("Nothing currently scheduled")
+                 
 
 @tasks.loop(minutes=1)
-async def scheduledMessage(ctx,message):
-    await ctx.send(message)
+async def scheduledMessage(ctx):
+    if os.stat('schedule.pkl').st_size != 0:
+        schedule = load_from_fileSchedule('schedule.pkl')
+        for key in schedule:
+            schedule[key][3] -= 1
+            if schedule[key][3] <=0:
+                await ctx.send(f"scheduled message: {schedule[key][2]}")
+                schedule[key][3] = schedule[key][1]
