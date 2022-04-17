@@ -36,13 +36,16 @@ async def debt(ctx, name:str, amt:float=0):
 # Will probably make this part of debt command later
 @bot.command()
 async def checkdebt(ctx):
-    if os.stat('debts.pkl').st_size != 0:
-        message = ""
-        debts = load_from_file('debts.pkl')
-        for key in debts:
-            message += f"{key} owes ${str(debts[key])}.\n"
-        await ctx.reply(f"Current debts:\n{message}")
-    else:
+    try:
+        if os.stat('debts.pkl').st_size != 0:
+            message = ""
+            debts = load_from_file('debts.pkl')
+            for key in debts:
+                message += f"{key} owes ${str(debts[key])}.\n"
+            await ctx.reply(f"Current debts:\n{message}")
+        else:
+            await ctx.reply(f"No current debts.")
+    except:
         await ctx.reply(f"No current debts.")
 
 # Will probably make this part of debt command later
