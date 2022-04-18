@@ -48,7 +48,7 @@ async def schedule(ctx, paramOne:str = "m" ,paramTwo:int = 1,message:str = "MSG"
         return
 
     messageCode = paramOne+str(time)+message[0]
-    if os.stat('schedule.pkl').st_size != 0:
+    if Path('schedule.pkl').is_file():
         schedule = load_from_fileSchedule('schedule.pkl')
         for key in schedule:
             if schedule[key] == [paramOne,time,message,time]:
