@@ -24,5 +24,8 @@ import money
 import schedule
 import alarm
 import help
+import calculator
+import coin
+import poll
 
 bot.run(TOKEN)
