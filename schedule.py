@@ -2,8 +2,12 @@ import os
 import pickle
 from pathlib import Path
 from builtins import bot
+import string
 from tracemalloc import start
 from discord.ext import tasks
+
+#dictionary to store indexs of lists relative to stuff
+d = {}
 
 # Code below take from money.py (Ryan's code I believe)
 def save_to_fileSchedule(dict, f):
@@ -31,7 +35,7 @@ def record_schedule(name, amt):
     save_to_fileSchedule(schedule, 'schedule.pkl')
 
 @bot.command()
-async def schedule(ctx, paramOne:str = "m" ,paramTwo:int = 1,message:str = "MSG"):
+async def schedule(ctx, paramOne:str ,paramTwo:int, message:str, stringList:str = ""):
     if type(paramTwo) != int:
          await ctx.reply("Unrecognized time frame")
     time = paramTwo
@@ -47,14 +51,19 @@ async def schedule(ctx, paramOne:str = "m" ,paramTwo:int = 1,message:str = "MSG"
         await ctx.reply("Unrecognized please use m for minutes, h for hours, d for days instead of " + paramOne)
         return
 
-    messageCode = paramOne+str(time)+message[0]
-    if Path('schedule.pkl').is_file():
+    l = stringList.split(" ")
+    for i in l:
+        print(i)
+    messageCode = paramOne+str(time)+message[0]+str(len(l))
+    if Path('schedule.pkl').is_file() and os.stat('schedule.pkl').st_size != 0:
         schedule = load_from_fileSchedule('schedule.pkl')
         for key in schedule:
-            if schedule[key] == [paramOne,time,message,time]:
+            d[key]=0
+            if schedule[key] == [paramOne,time,message,time,l]:
                 await ctx.reply("Already scheduled please resume or delete instead")
                 return
-    record_schedule(messageCode,[paramOne,time,message,time])
+    record_schedule(messageCode,[paramOne,time,message,time,l])
+    d[messageCode]=0
     await ctx.reply("Scheduled a message every "+ str(paramTwo)+" "+paramOne+" code is " + messageCode)
     try:
         scheduledMessage.start(ctx)
@@ -87,6 +96,7 @@ async def stopSchedule(ctx):
 async def clearSchedule(ctx):
     scheduledMessage.cancel()
     open("schedule.pkl", "w").close()
+    d.clear()
     await ctx.reply(f"All schedules cleared.")
 
 @bot.command()
@@ -106,7 +116,13 @@ async def scheduledMessage(ctx):
     if os.stat('schedule.pkl').st_size != 0:
         schedule = load_from_fileSchedule('schedule.pkl')
         for key in schedule:
-            schedule[key][3] -= 1
-            if schedule[key][3] <=0:
-                await ctx.send(f"scheduled message: {schedule[key][2]}")
-                schedule[key][3] = schedule[key][1]
+            temp = schedule[key]
+            temp[3] -= 1
+            if temp[3] <=0:
+                if len(temp[4]) == 0:
+                    await ctx.send(f"scheduled message: {temp[2]}")
+                else:
+                    l = temp[4]
+                    await ctx.send(f"scheduled message: {temp[2]} {l[d[key]]}")
+                    d[key] = (d[key]+1)%len(temp[4])
+                temp[3] = temp[1]
