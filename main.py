@@ -17,7 +17,7 @@ builtins.bot = bot
 @bot.event
 async def on_ready():
     # Set help message in status
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"{PREFIX}help"))
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=f"{PREFIX}help"))
 
 @bot.command()
 async def hello(ctx):
