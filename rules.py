@@ -18,7 +18,10 @@ async def on_ready():
         
 
 @bot.command()
-async def addRule(ctx, rule:str):
+async def addRule(ctx, *args):
+    rule = ""
+    for i in args:
+        rule += f"{i} "
     async with aiosqlite.connect("rules.db") as db:
         async with db.cursor() as cursor:
             await cursor.execute("SELECT rules from users WHERE guild = ? AND rules = ?",(ctx.guild.id,rule))
