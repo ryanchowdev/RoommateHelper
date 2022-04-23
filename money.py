@@ -27,13 +27,45 @@ def record_debt(name, amt):
     debts.update({name: amt})
     save_to_file(debts, 'debts.pkl')
 
-@bot.command()
-async def debt(ctx, name:str, amt:float=0):
-    rounded_amt = round(amt, 2)
-    record_debt(name, rounded_amt)
-    await ctx.reply(f"Added debt for {name} of amount ${rounded_amt:.2f}.")
+def my_debt(name):
+    try:
+        if os.stat('debts.pkl').st_size != 0:
+            debts = load_from_file('debts.pkl')
+            return debts[name]
+        else:
+            return -1
+    except:
+        return -1
 
-# Will probably make this part of debt command later
+@bot.command()
+async def debt(ctx, name:str, amt):
+    try:
+        amt = float(amt)
+        assert amt > 0
+        rounded_amt = round(amt, 2)
+        record_debt(name, rounded_amt)
+        await ctx.reply(f"Added debt for {name} of amount ${rounded_amt:.2f}.")
+    except AssertionError:
+        await ctx.reply("Debt amount must be positive (>0).")
+    except:
+        await ctx.reply("Invalid command. Usage: debt name amount")
+
+@bot.command()
+async def changedebt(ctx, name:str, amt):
+    try:
+        amt = float(amt)
+        rounded_amt = round(amt, 2)
+        current_debt = my_debt(name)
+        new_debt = 0
+        if current_debt == -1:
+            new_debt = max(rounded_amt, 0.00)
+        else:
+            new_debt = max(current_debt + rounded_amt, 0.00) # no negative debt
+        record_debt(name, new_debt)
+        await ctx.reply(f"Adjusted debt for {name} by {rounded_amt:.2f}. New debt: {new_debt:.2f}")
+    except:
+        await ctx.reply("Invalid command. Usage: changedebt name amount")
+
 @bot.command()
 async def checkdebt(ctx):
     try:
@@ -44,16 +76,16 @@ async def checkdebt(ctx):
                 message += f"{key} owes ${str(debts[key])}.\n"
             await ctx.reply(f"Current debts:\n{message}")
         else:
-            await ctx.reply(f"No current debts.")
+            await ctx.reply("No current debts.")
     except:
-        await ctx.reply(f"No current debts.")
+        await ctx.reply("No current debts.")
 
-# Will probably make this part of debt command later
 @bot.command()
 async def cleardebt(ctx):
     open("debts.pkl", "w").close()
-    await ctx.reply(f"All debts cleared.")
+    await ctx.reply("All debts cleared.")
 
 # Features to be added
 # Increment/decrement existing debt instead of overwriting with new value
 # Clear debt for individual person
+# Add reason/note for debts
