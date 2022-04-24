@@ -9,13 +9,15 @@ import builtins
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
-#bot = discord.Client(intents=discord.Intents.default())
 #variables
-
 PREFIX = '='
 bot = commands.Bot(command_prefix=PREFIX)
-
 builtins.bot = bot
+
+@bot.event
+async def on_ready():
+    # Set help message in status
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=f"{PREFIX}help"))
 
 @bot.command()
 async def hello(ctx):
@@ -30,5 +32,6 @@ import help
 import calculator
 import coin
 import poll
+import rules
 
 bot.run(TOKEN)
