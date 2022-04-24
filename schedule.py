@@ -1,41 +1,14 @@
+from operator import index
 import os
-import pickle
+import aiosqlite
 from pathlib import Path
 from builtins import bot
-import string
 from tracemalloc import start
 from discord.ext import tasks
 
-#dictionary to store indexs of lists relative to stuff
-d = {}
-
-# Code below take from money.py (Ryan's code I believe)
-def save_to_fileSchedule(dict, f):
-    schedule_file = open(f, 'bw+')
-    pickle.dump(dict, schedule_file)
-    schedule_file.close()
-
-def load_from_fileSchedule(f):
-    # create pickle file if it does not exist
-    myfile = Path(f)
-    myfile.touch(exist_ok=True)
-    # load
-    schedule_file = open(myfile, 'br')
-    schedule = pickle.load(schedule_file)
-    schedule_file.close()
-    return schedule
-
-def record_schedule(name, amt):
-    # create pickle file if it does not exist
-    myfile = Path('schedule.pkl')
-    myfile.touch(exist_ok=True)
-    # only load from pickle file if it is nonempty
-    schedule = load_from_fileSchedule('schedule.pkl') if os.stat('schedule.pkl').st_size != 0 else {}
-    schedule.update({name: amt})
-    save_to_fileSchedule(schedule, 'schedule.pkl')
-
 @bot.command()
 async def schedule(ctx, paramOne:str ,paramTwo:int, message:str, stringList:str = ""):
+    #Make sure parameters are good/convert time to minutes
     if type(paramTwo) != int:
          await ctx.reply("Unrecognized time frame")
     time = paramTwo
@@ -51,20 +24,18 @@ async def schedule(ctx, paramOne:str ,paramTwo:int, message:str, stringList:str 
         await ctx.reply("Unrecognized please use m for minutes, h for hours, d for days instead of " + paramOne)
         return
 
-    l = stringList.split(" ")
-    for i in l:
-        print(i)
-    messageCode = paramOne+str(time)+message[0]+str(len(l))
-    if Path('schedule.pkl').is_file() and os.stat('schedule.pkl').st_size != 0:
-        schedule = load_from_fileSchedule('schedule.pkl')
-        for key in schedule:
-            d[key]=0
-            if schedule[key] == [paramOne,time,message,time,l]:
-                await ctx.reply("Already scheduled please resume or delete instead")
+    #Check if already exists
+    async with aiosqlite.connect("main.db") as db:
+        async with db.cursor() as cursor:
+            await cursor.execute("SELECT * from schedulesTable WHERE guild = ? AND message = ? AND timeBetween = ?",(ctx.guild.id,message,time))
+            data = await cursor.fetchone()
+            if data:
+                await ctx.reply("Already scheduled. Perhaps use continueSchedule to continue?")
                 return
-    record_schedule(messageCode,[paramOne,time,message,time,l])
-    d[messageCode]=0
-    await ctx.reply("Scheduled a message every "+ str(paramTwo)+" "+paramOne+" code is " + messageCode)
+            else:
+                await cursor.execute("INSERT INTO schedulesTable (guild,timeBetween,timeLeft,message,list,currentIndex) VALUES (?,?,?,?,?,?)",(ctx.guild.id,time,time+1,message,stringList,0))
+                await ctx.reply("Scheduled a message every "+ str(paramTwo)+" "+paramOne+" Message: " + message)
+            await db.commit()
     try:
         scheduledMessage.start(ctx)
     except:
@@ -72,11 +43,15 @@ async def schedule(ctx, paramOne:str ,paramTwo:int, message:str, stringList:str 
 
 @bot.command()
 async def continueSchedule(ctx):
-    try:
-        if os.stat('schedule.pkl').st_size != 0:
-            scheduledMessage.start(ctx)
-    except:
-        await ctx.reply("No current Schedules")
+    async with aiosqlite.connect("main.db") as db:
+        async with db.cursor() as cursor:
+            await cursor.execute("SELECT * from schedulesTable WHERE guild = ?",(ctx.guild.id,))
+            data = await cursor.fetchone()
+            if data:
+                scheduledMessage.start(ctx)
+            else:
+                await ctx.reply("No scheduled messages")
+
 
 @bot.command()
 async def stopSchedule(ctx):
@@ -86,34 +61,50 @@ async def stopSchedule(ctx):
 @bot.command()
 async def clearSchedule(ctx):
     scheduledMessage.cancel()
-    open("schedule.pkl", "w").close()
-    d.clear()
-    await ctx.reply(f"All schedules cleared.")
+    async with aiosqlite.connect("main.db") as db:
+        async with db.cursor() as cursor:
+            await cursor.execute("DELETE FROM schedulesTable WHERE guild = ?",(ctx.guild.id,))
+        await ctx.reply("DELETED SCHEDULES")
+        await db.commit()
 
 @bot.command()
-async def currentSchedule(ctx):
-    try:
-        if os.stat('schedule.pkl').st_size != 0:
-            schedule = load_from_fileSchedule('schedule.pkl')
-            await ctx.reply("Current schedules:")
-            for key in schedule:
-                await ctx.reply(f"code: {key} msg: {schedule[key][2]}")
-    except:
-        await ctx.reply("Nothing currently scheduled")
+async def getSchedule(ctx):
+    async with aiosqlite.connect("main.db") as db:
+        async with db.cursor() as cursor:
+            await cursor.execute("SELECT * from schedulesTable WHERE guild = ?",(ctx.guild.id,))
+            data = await cursor.fetchall()
+            if data:
+                string = "SCHEDULES\n"
+                for i in data:
+                    string += f"{(i[4])} in {i[2]} minute(s) \n"
+                await ctx.reply(string)
+            else:
+                await ctx.reply(" NO Schedules CURRENTLY")
                  
 
 @tasks.loop(minutes=1)
 async def scheduledMessage(ctx):
-    if os.stat('schedule.pkl').st_size != 0:
-        schedule = load_from_fileSchedule('schedule.pkl')
-        for key in schedule:
-            temp = schedule[key]
-            temp[3] -= 1
-            if temp[3] <=0:
-                if len(temp[4]) == 0:
-                    await ctx.send(f"scheduled message: {temp[2]}")
-                else:
-                    l = temp[4]
-                    await ctx.send(f"scheduled message: {temp[2]} {l[d[key]]}")
-                    d[key] = (d[key]+1)%len(temp[4])
-                temp[3] = temp[1]
+    async with aiosqlite.connect("main.db") as db:
+        async with db.cursor() as cursor:
+            await cursor.execute("SELECT * from schedulesTable WHERE guild = ?",(ctx.guild.id,))
+            data = await cursor.fetchall()
+            if not data:
+                await ctx.reply("Nothing scheduled")
+                scheduledMessage.cancel()
+            else:
+                for d in data:
+                    print(d)
+                    d = list(d)
+                    d[2]-=1
+                    await cursor.execute("UPDATE schedulesTable SET timeLeft = ? WHERE guild = ? AND message = ? AND timeBetween = ? AND list = ?",(d[2],ctx.guild.id,d[4],d[1],d[5]))
+                    if d[2]<=0:
+                        if len(d[5]) == 0:
+                            await ctx.send(f"scheduled message: {d[4]}")
+                        else:
+                            l = d[5].split(" ")
+                            await ctx.send(f"scheduled Message: {d[4]} {l[d[3]]}")
+                            d[3] = (d[3]+1)%len(l)
+                            await cursor.execute("UPDATE schedulesTable SET currentIndex = ? WHERE guild = ? AND message = ? AND timeBetween = ? AND list = ?",(d[3],ctx.guild.id,d[4],d[1],d[5]))
+                        await cursor.execute("UPDATE schedulesTable SET timeLeft = ? WHERE guild = ? AND message = ? AND timeBetween = ? AND list = ?",(d[1],ctx.guild.id,d[4],d[1],d[5]))
+                    d = tuple(d)
+        await db.commit()
