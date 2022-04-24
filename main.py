@@ -9,8 +9,9 @@ import builtins
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
+#bot = discord.Client(intents=discord.Intents.default())
 #variables
-bot = commands.Bot(command_prefix='=')
+bot = commands.Bot(command_prefix='=', intents=discord.Intents.all())
 
 builtins.bot = bot
 
