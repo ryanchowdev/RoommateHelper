@@ -33,5 +33,6 @@ import calculator
 import coin
 import poll
 import rules
+import tables
 
 bot.run(TOKEN)
