@@ -133,5 +133,8 @@ dmypy.json
 *.pkl
 *.pickle
 
+#Database files
+*.db
+
 # Pycharm files
 .idea

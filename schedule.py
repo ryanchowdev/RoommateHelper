@@ -78,15 +78,6 @@ async def continueSchedule(ctx):
     except:
         await ctx.reply("No current Schedules")
 
-
-#@bot.command()
-#async def startSchedule(ctx):
-#    try:
-#        await ctx.send("Starting Schedule")
-#        scheduledMessage.start(ctx)
-#    except:
-#        await ctx.send("could not start schedule")
-
 @bot.command()
 async def stopSchedule(ctx):
     scheduledMessage.cancel()
