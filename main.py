@@ -11,7 +11,7 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 
 #bot = discord.Client(intents=discord.Intents.default())
 #variables
-#bot = commands.Bot(command_prefix='=', intents=discord.Intents.all())
+
 PREFIX = '='
 bot = commands.Bot(command_prefix=PREFIX)
 
