@@ -5,9 +5,10 @@ from pathlib import Path
 from builtins import bot
 from tracemalloc import start
 from discord.ext import tasks
+from datetime import datetime , date 
 
 @bot.command()
-async def schedule(ctx, paramOne:str ,paramTwo:int, message:str, stringList:str = ""):
+async def schedule(ctx, paramOne:str ,paramTwo:int, message:str, stringList:str = "", dateStart:str = ""):
     #Make sure parameters are good/convert time to minutes
     if type(paramTwo) != int:
          await ctx.reply("Unrecognized time frame")
@@ -21,9 +22,23 @@ async def schedule(ctx, paramOne:str ,paramTwo:int, message:str, stringList:str 
         paramOne = "day"
         time*=60*24
     else:
-        await ctx.reply("Unrecognized please use m for minutes, h for hours, d for days instead of " + paramOne)
+        await ctx.reply("Unrecognized. Please use m for minutes, h for hours, d for days instead of " + paramOne)
         return
-
+    timeBetween = time
+    if dateStart !="":
+        try:
+            date_format = datetime.strptime(dateStart, '%m/%d/%Y %H:%M')
+            now = datetime.now()
+            diff = now-date_format
+            if diff <0:
+                await ctx.reply("Time has already passed. Please reschedule")
+                return
+            
+            timeBetween+= abs(int(diff.total_seconds() / 60))-1
+        except:
+            print(dateStart)
+            await ctx.reply("Unrecognized time format. Needs both date m/d/y and h:m in one string for start time")
+            return
     #Check if already exists
     async with aiosqlite.connect("main.db") as db:
         async with db.cursor() as cursor:
@@ -33,7 +48,7 @@ async def schedule(ctx, paramOne:str ,paramTwo:int, message:str, stringList:str 
                 await ctx.reply("Already scheduled. Perhaps use continueSchedule to continue?")
                 return
             else:
-                await cursor.execute("INSERT INTO schedulesTable (guild,timeBetween,timeLeft,message,list,currentIndex) VALUES (?,?,?,?,?,?)",(ctx.guild.id,time,time+1,message,stringList,0))
+                await cursor.execute("INSERT INTO schedulesTable (guild,timeBetween,timeLeft,message,list,currentIndex) VALUES (?,?,?,?,?,?)",(ctx.guild.id,time,timeBetween+1,message,stringList,0))
                 await ctx.reply("Scheduled a message every "+ str(paramTwo)+" "+paramOne+" Message: " + message)
             await db.commit()
     try:
