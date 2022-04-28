@@ -12,6 +12,7 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 #variables
 PREFIX = '='
 bot = commands.Bot(command_prefix=PREFIX)
+
 builtins.bot = bot
 
 @bot.event
