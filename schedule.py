@@ -1,5 +1,7 @@
 from operator import index
 import os
+import random
+from random import randint
 import aiosqlite
 from pathlib import Path
 from builtins import bot
@@ -43,19 +45,17 @@ async def schedule(ctx, paramOne:str ,paramTwo:int, message:str, stringList:str 
     #Check if already exists
     async with aiosqlite.connect("main.db") as db:
         async with db.cursor() as cursor:
-            await cursor.execute("SELECT * from schedulesTable WHERE guild = ? AND message = ? AND timeBetween = ?",(ctx.guild.id,message,time))
+            code = random.randint(100000000,999999999)
+            await cursor.execute("SELECT * from schedulesTable WHERE guild = ? AND id = ?",(ctx.guild.id,code))
             data = await cursor.fetchone()
-            if data:
-                await ctx.reply("Already scheduled. Perhaps use continueSchedule to continue?")
-                return
-            else:
-                await cursor.execute("INSERT INTO schedulesTable (guild,timeBetween,timeLeft,message,list,currentIndex) VALUES (?,?,?,?,?,?)",(ctx.guild.id,time,timeBetween+1,message,stringList,0))
-                await ctx.reply("Scheduled a message every "+ str(paramTwo)+" "+paramOne+" Message: " + message)
+            while data:
+                code = random.randint(100000000,999999999)
+                await cursor.execute("SELECT * from schedulesTable WHERE guild = ? AND id = ?",(ctx.guild.id,code))
+                data = await cursor.fetchone()
+            await cursor.execute("INSERT INTO schedulesTable (guild,timeBetween,timeLeft,message,list,currentIndex,id) VALUES (?,?,?,?,?,?,?)",(ctx.guild.id,time,timeBetween+1,message,stringList,0,code))
+            await ctx.reply("Scheduled a message every "+ str(paramTwo)+" "+paramOne+" Message: " + message)
             await db.commit()
-    try:
-        scheduledMessage.start(ctx)
-    except:
-        pass
+    scheduledMessage.start(ctx)
 
 @bot.command()
 async def continueSchedule(ctx):
@@ -75,6 +75,14 @@ async def stopSchedule(ctx):
     await ctx.reply("Stopped schedule(s)")
 
 @bot.command()
+async def deleteSchedule(ctx,id:int):
+    async with aiosqlite.connect("main.db") as db:
+        async with db.cursor() as cursor:
+            await cursor.execute("DELETE FROM schedulesTable WHERE guild = ? AND id = ?",(ctx.guild.id,id))
+        await ctx.reply("DELETED SCHEDULE")
+        await db.commit()
+
+@bot.command()
 async def clearSchedule(ctx):
     scheduledMessage.cancel()
     async with aiosqlite.connect("main.db") as db:
@@ -92,7 +100,8 @@ async def getSchedule(ctx):
             if data:
                 string = "SCHEDULES\n"
                 for i in data:
-                    string += f"{(i[4])} in {i[2]} minute(s) \n"
+                    print(i)
+                    string += f"{(i[4])} in {i[2]} minute(s) id is {i[6]}\n"
                 await ctx.reply(string)
             else:
                 await ctx.reply(" NO Schedules CURRENTLY")
@@ -105,7 +114,6 @@ async def scheduledMessage(ctx):
             await cursor.execute("SELECT * from schedulesTable WHERE guild = ?",(ctx.guild.id,))
             data = await cursor.fetchall()
             if not data:
-                await ctx.reply("Nothing scheduled")
                 scheduledMessage.cancel()
             else:
                 for d in data:
