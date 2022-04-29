@@ -27,16 +27,17 @@ async def schedule(ctx, paramOne:str ,paramTwo:int, message:str, stringList:str 
     timeBetween = time
     if dateStart !="":
         try:
-            date_format = datetime.strptime(dateStart, '%m/%d/%Y %H:%M')
-            now = datetime.now()
-            diff = now-date_format
+            date_format = datetime.strptime(dateStart, "%m/%d/%Y %H:%M")
+            print(f"date format is {date_format}")
+            diff = date_format-datetime.now() 
+            diff = int(diff.total_seconds() / 60)
+            print(f"diff is {diff}")
             if diff <0:
                 await ctx.reply("Time has already passed. Please reschedule")
                 return
-            
-            timeBetween+= abs(int(diff.total_seconds() / 60))-1
+            timeBetween+= abs(diff)
         except:
-            print(dateStart)
+            print(f"exception: dateStart is {dateStart}")
             await ctx.reply("Unrecognized time format. Needs both date m/d/y and h:m in one string for start time")
             return
     #Check if already exists
