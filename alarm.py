@@ -5,32 +5,12 @@ from builtins import bot
 from datetime import datetime , date 
 from pytz import timezone
 import pytz
+import aiosqlite
+
 
 from discord.ext import tasks
 
-def save_to_file_Alarm(dict, f):
-    alarms_file = open(f, 'bw+')
-    pickle.dump(dict, alarms_file)
-    alarms_file.close()
 
-def load_from_file_Alarm(f):
-    # create pickle file if it does not exist
-    myfile = Path(f)
-    myfile.touch(exist_ok=True)
-    # load
-    alarms_file = open(myfile, 'br')
-    alarms = pickle.load(alarms_file)
-    alarms_file.close()
-    return alarms
-
-def record_alarm(event, time):
-    # create pickle file if it does not exist
-    myfile = Path('alarms.pkl')
-    myfile.touch(exist_ok=True)
-    # only load from pickle file if it is nonempty
-    alarms = load_from_file_Alarm('alarms.pkl') if os.stat('alarms.pkl').st_size != 0 else {}
-    alarms.update({event: time})
-    save_to_file_Alarm(alarms, 'alarms.pkl')
 
 @bot.command()
 async def alarm(ctx, event:str,date:str, time:str):
@@ -38,8 +18,17 @@ async def alarm(ctx, event:str,date:str, time:str):
   try:
     date_format = datetime.strptime(date, '%m/%d/%Y')
     time_format = datetime.strptime(time, '%H:%M')
-    record_alarm(event, (date, time))
-    await ctx.reply(f"Added alarm for {event} on {date} at {time}")
+    async with aiosqlite.connect("main.db") as db:
+        async with db.cursor() as cursor:
+            await cursor.execute("SELECT * from alarmsTable WHERE guild = ? AND event = ? AND date = ? AND time = ?",(ctx.guild.id,event,date, time))
+            data = await cursor.fetchone()
+            if data:
+                await ctx.reply("Already scheduled. ")
+                return
+            else:
+                await cursor.execute("INSERT INTO alarmsTable (guild,event,date,time) VALUES (?,?,?,?)",(ctx.guild.id,event,date,time))
+            await ctx.reply(f"Added alarm for {event} on {date} at {time}")
+            await db.commit()    
     if not check_time.is_running():
       check_time.start(ctx)
   except ValueError:
@@ -47,58 +36,64 @@ async def alarm(ctx, event:str,date:str, time:str):
 
 @bot.command()
 async def checkalarm(ctx):
-  #check if alarm pickle file exists
-  try:
-    if os.stat('alarms.pkl').st_size != 0:
-        message = ""
-        alarms = load_from_file_Alarm('alarms.pkl')
-        for event in alarms:
-            message += f"{event}, {alarms[event][0]}, {alarms[event][1]} \n"
-        await ctx.reply(f"Current alarms:\n{message}")
-    else:
-        await ctx.reply(f"No current alarms.")
-  except:
-    await ctx.reply(f"No current alarms.")
+    async with aiosqlite.connect("main.db") as db:
+        async with db.cursor() as cursor:
+            await cursor.execute("SELECT * from alarmsTable WHERE guild = ?",(ctx.guild.id,))
+            data = await cursor.fetchall()
+            if data:
+                string = "Current Alarms\n"
+                for i in data:
+                    string += f"{(i[1])} {(i[2])}  {i[3]}  \n"
+                await ctx.reply(string)
+            else:
+                await ctx.reply(" NO ALARMS CURRENTLY")
 
 @bot.command()
 async def clearalarm(ctx):
-    open("alarms.pkl", "w").close()
-    await ctx.reply(f"All alarms cleared.")
+    async with aiosqlite.connect("main.db") as db:
+        async with db.cursor() as cursor:
+            await cursor.execute("DELETE FROM alarmsTable WHERE guild = ?",(ctx.guild.id,))
+        await ctx.reply("DELETED ALARMS")
+        await db.commit()
 
 @bot.command()
 async def removealarm(ctx, event:str):
-  alarms = load_from_file_Alarm('alarms.pkl')
-  if event not in alarms:
-    await ctx.reply(f"Alarm does not exist.")    
-  else:  
-    del(alarms[event])
-    alarms.update()
-    save_to_file_Alarm(alarms, 'alarms.pkl')
-    await ctx.reply(f"Removed alarm - {event}.")    
+    found = False
+    async with aiosqlite.connect("main.db") as db:
+        async with db.cursor() as cursor:
+            await cursor.execute("SELECT * from alarmsTable WHERE guild = ?",(ctx.guild.id,))
+            data = await cursor.fetchall()
+            if data:
+                for i in data:
+                    if(i[1] == event):
+                      found = True
+                      await cursor.execute("DELETE FROM alarmsTable WHERE guild = ? AND event  = ?" ,(ctx.guild.id, i[1]))
+                      await ctx.reply(f"Removed alarm - {event}.")    
+                      await db.commit()
+    if(found == False):
+      await ctx.reply(f"Alarm does not exist.")    
+
+
 
 #check for alarms and compare to current time once per minute
-#will make this more efficient in later
 @tasks.loop(minutes=1.0, count=None)
 async def check_time(ctx): 
-  alarms = load_from_file_Alarm('alarms.pkl')
-  alarms_copy = {}
+
   today = datetime.now().astimezone(timezone('US/Pacific'))
   today_time = today.strftime("%H:%M")
   #remove leading zeroes from dates for consistency
   today_date = "%d/%d/%d"%(today.month, today.day, today.year)
-  removed = False
-  for event in alarms:
-    event_date = datetime.strptime(alarms[event][0], '%m/%d/%Y')
-    event_date = "%d/%d/%d"%(event_date.month, event_date.day, event_date.year)
-    #removing finished alarms from list
-    if alarms[event][0] <= today_date and alarms[event][1] <= today_time:
-      removed = True
-      await ctx.reply(f"{event} starting.") 
-    else:
-      alarms_copy[event] = alarms[event]
-      alarms_copy.update()
-      save_to_file_Alarm(alarms_copy, 'alarms.pkl')
-  if removed == True and len(alarms) == 1:
-    open("alarms.pkl", "w").close()
-    #stop checking when no alarms left
-    check_time.cancel()
+  async with aiosqlite.connect("main.db") as db:
+        async with db.cursor() as cursor:
+            await cursor.execute("SELECT * from alarmsTable WHERE guild = ?",(ctx.guild.id,))
+            data = await cursor.fetchall()
+            if data:
+                for i in data:
+                  event_date = datetime.strptime(i[2], '%m/%d/%Y')
+                  event_date = "%d/%d/%d"%(event_date.month, event_date.day, event_date.year)
+                  if i[2] <= today_date and i[3] <= today_time:
+                    await ctx.reply(f"{i[1]} starting.")
+                    await cursor.execute("DELETE FROM alarmsTable WHERE guild = ? AND event  = ?" ,(ctx.guild.id, i[1]))
+                    await db.commit()
+                    
+
