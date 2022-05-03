@@ -14,5 +14,5 @@ async def on_ready():
     async with aiosqlite.connect("main.db") as db:
         async with db.cursor() as cursor:
             await cursor.execute('CREATE TABLE IF NOT EXISTS rulesTable (guild INTEGER, rules STRING)')
-            await cursor.execute('CREATE TABLE IF NOT EXISTS schedulesTable (guild INTEGER, timeBetween INTEGER, timeLeft INTEGER,currentIndex INTEGER,message STRING,list STRING, id INTEGER)')
+            await cursor.execute('CREATE TABLE IF NOT EXISTS schedulesTable (guild INTEGER, timeBetween INTEGER, alarmTime DATETIME,currentIndex INTEGER,message STRING,list STRING, id INTEGER)')
         await db.commit()

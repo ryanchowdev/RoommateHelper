@@ -7,7 +7,9 @@ from pathlib import Path
 from builtins import bot
 from tracemalloc import start
 from discord.ext import tasks
-from datetime import datetime , date 
+from datetime import datetime , date, timedelta 
+
+dateFormat = "%Y-%m-%d %H:%M:%S.%f"
 
 @bot.command()
 async def schedule(ctx, paramOne:str ,paramTwo:int, message:str, stringList:str = "", dateStart:str = ""):
@@ -37,11 +39,12 @@ async def schedule(ctx, paramOne:str ,paramTwo:int, message:str, stringList:str 
             if diff <0:
                 await ctx.reply("Time has already passed. Please reschedule")
                 return
-            timeBetween+= abs(diff)
+            timeBetween+= diff
         except:
             print(f"exception: dateStart is {dateStart}")
             await ctx.reply("Unrecognized time format. Needs both date m/d/y and h:m in one string for start time")
             return
+    finalTime = datetime.now()+timedelta(minutes=(timeBetween))
     #Check if already exists
     async with aiosqlite.connect("main.db") as db:
         async with db.cursor() as cursor:
@@ -52,10 +55,13 @@ async def schedule(ctx, paramOne:str ,paramTwo:int, message:str, stringList:str 
                 code = random.randint(100000000,999999999)
                 await cursor.execute("SELECT * from schedulesTable WHERE guild = ? AND id = ?",(ctx.guild.id,code))
                 data = await cursor.fetchone()
-            await cursor.execute("INSERT INTO schedulesTable (guild,timeBetween,timeLeft,message,list,currentIndex,id) VALUES (?,?,?,?,?,?,?)",(ctx.guild.id,time,timeBetween+1,message,stringList,0,code))
+            await cursor.execute("INSERT INTO schedulesTable (guild,timeBetween,alarmTime,message,list,currentIndex,id) VALUES (?,?,?,?,?,?,?)",(ctx.guild.id,time,finalTime,message,stringList,0,code))
             await ctx.reply("Scheduled a message every "+ str(paramTwo)+" "+paramOne+" Message: " + message)
             await db.commit()
-    scheduledMessage.start(ctx)
+    try:
+        scheduledMessage.start(ctx)
+    except:
+        print("Schedule is already running")
 
 @bot.command()
 async def continueSchedule(ctx):
@@ -64,6 +70,14 @@ async def continueSchedule(ctx):
             await cursor.execute("SELECT * from schedulesTable WHERE guild = ?",(ctx.guild.id,))
             data = await cursor.fetchone()
             if data:
+                data = await cursor.fetchall()
+                for d in data:
+                    d = list(d)
+                    expectedTime = datetime.strptime(d[2],dateFormat)
+                    while int((expectedTime-datetime.now()).total_seconds() / 60)<=0:
+                        expectedTime = datetime.now()+timedelta(minutes=d[1])
+                    d[2] = expectedTime
+                    d = tuple(d)
                 scheduledMessage.start(ctx)
             else:
                 await ctx.reply("No scheduled messages")
@@ -101,7 +115,7 @@ async def getSchedule(ctx):
                 string = "SCHEDULES\n"
                 for i in data:
                     print(i)
-                    string += f"{(i[4])} in {i[2]} minute(s) id is {i[6]}\n"
+                    string += f"{(i[4])} at {i[2]} id is {i[6]}\n"
                 await ctx.reply(string)
             else:
                 await ctx.reply(" NO Schedules CURRENTLY")
@@ -117,18 +131,18 @@ async def scheduledMessage(ctx):
                 scheduledMessage.cancel()
             else:
                 for d in data:
-                    print(d)
                     d = list(d)
-                    d[2]-=1
-                    await cursor.execute("UPDATE schedulesTable SET timeLeft = ? WHERE guild = ? AND message = ? AND timeBetween = ? AND list = ?",(d[2],ctx.guild.id,d[4],d[1],d[5]))
-                    if d[2]<=0:
+                    expectedTime = datetime.strptime(d[2],dateFormat)
+                    print(int((expectedTime-datetime.now()).total_seconds() / 60))
+                    if int((expectedTime-datetime.now()).total_seconds() / 60)<=0:
                         if len(d[5]) == 0:
                             await ctx.send(f"scheduled message: {d[4]}")
                         else:
                             l = d[5].split(" ")
                             await ctx.send(f"scheduled Message: {d[4]} {l[d[3]]}")
                             d[3] = (d[3]+1)%len(l)
-                            await cursor.execute("UPDATE schedulesTable SET currentIndex = ? WHERE guild = ? AND message = ? AND timeBetween = ? AND list = ?",(d[3],ctx.guild.id,d[4],d[1],d[5]))
-                        await cursor.execute("UPDATE schedulesTable SET timeLeft = ? WHERE guild = ? AND message = ? AND timeBetween = ? AND list = ?",(d[1],ctx.guild.id,d[4],d[1],d[5]))
+                            await cursor.execute("UPDATE schedulesTable SET currentIndex = ? WHERE guild = ? AND id = ?",(d[3],ctx.guild.id,d[6]))
+                        nextTime = datetime.now()+timedelta(minutes=d[1])
+                        await cursor.execute("UPDATE schedulesTable SET alarmTime = ? WHERE guild = ? AND id = ?",(nextTime,ctx.guild.id,d[6]))
                     d = tuple(d)
         await db.commit()
