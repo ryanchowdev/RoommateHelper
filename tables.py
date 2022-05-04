@@ -15,4 +15,5 @@ async def on_ready():
         async with db.cursor() as cursor:
             await cursor.execute('CREATE TABLE IF NOT EXISTS rulesTable (guild INTEGER, rules STRING)')
             await cursor.execute('CREATE TABLE IF NOT EXISTS schedulesTable (guild INTEGER, timeBetween INTEGER, alarmTime DATETIME,currentIndex INTEGER,message STRING,list STRING, id INTEGER)')
+            await cursor.execute('CREATE TABLE IF NOT EXISTS alarmsTable (guild INTEGER, event STRING, date STRING, time STRING)')
         await db.commit()
