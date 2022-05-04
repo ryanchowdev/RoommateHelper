@@ -9,7 +9,7 @@ from tracemalloc import start
 from discord.ext import tasks
 from datetime import datetime , date, timedelta 
 
-dateFormat = "%Y-%m-%d %H:%M:%S.%f"
+dateFormat = "%Y-%m-%d %H:%M:%S"
 
 @bot.command()
 async def schedule(ctx, paramOne:str ,paramTwo:int, message:str, stringList:str = "", dateStart:str = ""):
@@ -29,22 +29,15 @@ async def schedule(ctx, paramOne:str ,paramTwo:int, message:str, stringList:str 
         await ctx.reply("Unrecognized. Please use m for minutes, h for hours, d for days instead of " + paramOne)
         return
     timeBetween = time
+    currentTime = datetime.strptime(datetime.now().strftime("%Y-%m-%d, %H:%M"),"%Y-%m-%d, %H:%M")
     if dateStart !="":
         try:
-            date_format = datetime.strptime(dateStart, "%m/%d/%Y %H:%M")
-            print(f"date format is {date_format}")
-            diff = date_format-datetime.now() 
-            diff = int(diff.total_seconds() / 60)
-            print(f"diff is {diff}")
-            if diff <0:
-                await ctx.reply("Time has already passed. Please reschedule")
-                return
-            timeBetween+= diff
+            currentTime = datetime.strptime(dateStart, "%m/%d/%Y %H:%M")
         except:
             print(f"exception: dateStart is {dateStart}")
             await ctx.reply("Unrecognized time format. Needs both date m/d/y and h:m in one string for start time")
             return
-    finalTime = datetime.now()+timedelta(minutes=(timeBetween))
+    finalTime = currentTime
     #Check if already exists
     async with aiosqlite.connect("main.db") as db:
         async with db.cursor() as cursor:
@@ -61,7 +54,7 @@ async def schedule(ctx, paramOne:str ,paramTwo:int, message:str, stringList:str 
     try:
         scheduledMessage.start(ctx)
     except:
-        print("Schedule is already running")
+        print("Already running scheduledMessage")
 
 @bot.command()
 async def continueSchedule(ctx):
@@ -71,11 +64,12 @@ async def continueSchedule(ctx):
             data = await cursor.fetchone()
             if data:
                 data = await cursor.fetchall()
+                currentTime = datetime.strptime(datetime.now().strftime("%Y-%m-%d, %H:%M"),"%Y-%m-%d, %H:%M")
                 for d in data:
                     d = list(d)
                     expectedTime = datetime.strptime(d[2],dateFormat)
-                    while int((expectedTime-datetime.now()).total_seconds() / 60)<=0:
-                        expectedTime = datetime.now()+timedelta(minutes=d[1])
+                    while int((expectedTime-currentTime).total_seconds() / 60)<=0:
+                        expectedTime = currentTime+timedelta(minutes=d[1])
                     d[2] = expectedTime
                     d = tuple(d)
                 scheduledMessage.start(ctx)
@@ -133,8 +127,10 @@ async def scheduledMessage(ctx):
                 for d in data:
                     d = list(d)
                     expectedTime = datetime.strptime(d[2],dateFormat)
-                    print(int((expectedTime-datetime.now()).total_seconds() / 60))
-                    if int((expectedTime-datetime.now()).total_seconds() / 60)<=0:
+                    currentTime = datetime.strptime(datetime.now().strftime("%Y-%m-%d, %H:%M"),"%Y-%m-%d, %H:%M")
+                    outcome = int((expectedTime-currentTime).total_seconds() / 60)
+                    print(f"{d} and time diff is {outcome}")
+                    if outcome<1:
                         if len(d[5]) == 0:
                             await ctx.send(f"scheduled message: {d[4]}")
                         else:
