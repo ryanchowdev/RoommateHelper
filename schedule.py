@@ -25,10 +25,15 @@ async def schedule(ctx, paramOne:str ,paramTwo:int, message:str, stringList:str 
     elif paramOne in ["d","day"]:
         paramOne = "day"
         time*=60*24
+    elif paramOne in ["week","w"]:
+        paramOne = "week"
+        time*=60*24*7
+    elif paramOne in ["year","y"]:
+        paramOne = "year"
+        time*=60*24*365
     else:
         await ctx.reply("Unrecognized. Please use m for minutes, h for hours, d for days instead of " + paramOne)
         return
-    timeBetween = time
     currentTime = datetime.strptime(datetime.now().strftime("%Y-%m-%d, %H:%M"),"%Y-%m-%d, %H:%M")
     if dateStart !="":
         try:
@@ -142,3 +147,5 @@ async def scheduledMessage(ctx):
                         await cursor.execute("UPDATE schedulesTable SET alarmTime = ? WHERE guild = ? AND id = ?",(nextTime,ctx.guild.id,d[6]))
                     d = tuple(d)
         await db.commit()
+
+
