@@ -1,5 +1,5 @@
 from operator import index
-import os
+import discord
 import random
 from random import randint
 import aiosqlite
@@ -131,16 +131,29 @@ async def scheduledMessage(ctx):
             else:
                 for d in data:
                     d = list(d)
-                    expectedTime = datetime.strptime(d[2],dateFormat)
+                    try:
+                        expectedTime = datetime.strptime(d[2],dateFormat)
+                    except:
+                        expectedTime = datetime.strptime(d[2],"%Y-%m-%d %H:%M:%S.%f")
                     currentTime = datetime.strptime(datetime.now().strftime("%Y-%m-%d, %H:%M"),"%Y-%m-%d, %H:%M")
                     outcome = int((expectedTime-currentTime).total_seconds() / 60)
                     print(f"{d} and time diff is {outcome}")
+
+                    await cursor.execute("SELECT list from restrictTable WHERE guild = ? AND category = ?",(ctx.guild.id,"schedule"))
+                    c = await cursor.fetchone()
+                    channel = discord.utils.get(ctx.guild.text_channels, name=c[0])
+                    print(f"{channel} is the channel gotten from {c[0]}")
                     if outcome<1:
-                        if len(d[5]) == 0:
+                        if len(d[5]) == 0 and channel == None:
                             await ctx.send(f"scheduled message: {d[4]}")
+                        elif len(d[5]) == 0 and channel:
+                            await channel.send(f"scheduled message: {d[4]}")
                         else:
                             l = d[5].split(" ")
-                            await ctx.send(f"scheduled Message: {d[4]} {l[d[3]]}")
+                            if channel!=None:
+                                await channel.send(f"scheduled Message: {d[4]} {l[d[3]]}")
+                            else:
+                                await ctx.send(f"scheduled Message: {d[4]} {l[d[3]]}")
                             d[3] = (d[3]+1)%len(l)
                             await cursor.execute("UPDATE schedulesTable SET currentIndex = ? WHERE guild = ? AND id = ?",(d[3],ctx.guild.id,d[6]))
                         nextTime = datetime.now()+timedelta(minutes=d[1])
