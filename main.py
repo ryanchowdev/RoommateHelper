@@ -35,5 +35,6 @@ import coin
 import poll
 import rules
 import tables
+import restrict
 
 bot.run(TOKEN)

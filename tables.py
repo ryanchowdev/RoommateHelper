@@ -2,7 +2,7 @@ import os
 import aiosqlite
 from pathlib import Path
 from builtins import bot
-
+ 
 #Create tables in here
 @bot.event
 async def on_ready():
@@ -16,4 +16,5 @@ async def on_ready():
             await cursor.execute('CREATE TABLE IF NOT EXISTS rulesTable (guild INTEGER, rules STRING)')
             await cursor.execute('CREATE TABLE IF NOT EXISTS schedulesTable (guild INTEGER, timeBetween INTEGER, alarmTime DATETIME,currentIndex INTEGER,message STRING,list STRING, id INTEGER)')
             await cursor.execute('CREATE TABLE IF NOT EXISTS alarmsTable (guild INTEGER, event STRING, date STRING, time STRING)')
+            await cursor.execute('CREATE TABLE IF NOT EXISTS restrictTable (guild INTEGER, category STRING,list STRING)')
         await db.commit()
