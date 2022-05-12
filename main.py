@@ -15,15 +15,6 @@ bot = commands.Bot(command_prefix=PREFIX)
 
 builtins.bot = bot
 
-@bot.event
-async def on_ready():
-    # Set help message in status
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=f"{PREFIX}help"))
-
-@bot.command()
-async def hello(ctx):
-    await ctx.reply("Hello!")
-
 # import bot features
 import weather
 import money
@@ -36,5 +27,18 @@ import poll
 import rules
 import tables
 import restrict
+
+@bot.event
+async def on_ready():
+    # Set help message in status
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=f"{PREFIX}help"))
+    # Setup tables
+    print("Creating database tables now...\n")
+    await tables.create_tables()
+    print("Tables created.\n")
+
+@bot.command()
+async def hello(ctx):
+    await ctx.reply("Hello!")
 
 bot.run(TOKEN)

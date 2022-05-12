@@ -3,15 +3,15 @@ import aiosqlite
 from pathlib import Path
 from builtins import bot
  
-#Create tables in here
-@bot.event
-async def on_ready():
-    print("CREATING TABLES NOW \n")
+DBFILE = "main.db"
+
+# Create tables in here
+async def create_tables():
     try:
-        aiosqlite.connect("main.db")
+        aiosqlite.connect(DBFILE)
     except:
-        print("Error with main.db")
-    async with aiosqlite.connect("main.db") as db:
+        print(f"Error with {DBFILE}")
+    async with aiosqlite.connect(DBFILE) as db:
         async with db.cursor() as cursor:
             await cursor.execute('CREATE TABLE IF NOT EXISTS rulesTable (guild INTEGER, rules TEXT)')
             await cursor.execute('CREATE TABLE IF NOT EXISTS schedulesTable (guild INTEGER, timeBetween INTEGER, alarmTime DATETIME,currentIndex INTEGER,message TEXT,list TEXT, id INTEGER)')
