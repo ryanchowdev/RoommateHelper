@@ -17,5 +17,5 @@ async def on_ready():
             await cursor.execute('CREATE TABLE IF NOT EXISTS schedulesTable (guild INTEGER, timeBetween INTEGER, alarmTime DATETIME,currentIndex INTEGER,message TEXT,list TEXT, id INTEGER)')
             await cursor.execute('CREATE TABLE IF NOT EXISTS alarmsTable (guild INTEGER, event TEXT, date TEXT, time TEXT)')
             await cursor.execute('CREATE TABLE IF NOT EXISTS restrictTable (guild INTEGER, category TEXT,list TEXT)')
-            await cursor.execute('CREATE TABLE IF NOT EXISTS moneyTable (guild INTEGER, person TEXT, amount INTEGER)')
+            await cursor.execute('CREATE TABLE IF NOT EXISTS moneyTable (guild INTEGER, person TEXT, amount REAL)')
         await db.commit()
