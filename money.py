@@ -1,7 +1,10 @@
 import os
 import pickle
+import aiosqlite
 from pathlib import Path
 from builtins import bot
+
+DBFILE = "main.db"
 
 def save_to_file(dict, f):
     debts_file = open(f, 'bw+')
@@ -45,6 +48,8 @@ async def debt(ctx, name:str, amt):
         rounded_amt = round(amt, 2)
         record_debt(name, rounded_amt)
         await ctx.reply(f"Added debt for {name} of amount ${rounded_amt:.2f}.")
+        # async with aiosqlite.connect(DBFILE) as db:
+        #     async with db.cursor() as cursor:
     except AssertionError:
         await ctx.reply("Debt amount must be positive (>0).")
     except:
@@ -84,8 +89,3 @@ async def checkdebt(ctx):
 async def cleardebt(ctx):
     open("debts.pkl", "w").close()
     await ctx.reply("All debts cleared.")
-
-# Features to be added
-# Increment/decrement existing debt instead of overwriting with new value
-# Clear debt for individual person
-# Add reason/note for debts
