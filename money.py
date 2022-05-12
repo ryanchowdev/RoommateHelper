@@ -76,3 +76,18 @@ async def cleardebt(ctx):
             await cursor.execute("DELETE FROM moneyTable WHERE guild = ?", (ctx.guild.id,))
         await db.commit()
         await ctx.reply("All debts cleared.")
+
+@bot.command()
+async def removedebt(ctx, name:str):
+    async with aiosqlite.connect(DBFILE) as db:
+        async with db.cursor() as cursor:
+            # get debt for name
+            await cursor.execute("SELECT * FROM moneyTable WHERE guild = ? AND person = ?", (ctx.guild.id, name))
+            data = await cursor.fetchone()
+            if data:
+                # delete record for this name
+                await cursor.execute("DELETE FROM moneyTable WHERE guild = ? AND person = ?", (ctx.guild.id, name))
+                await db.commit()
+                await ctx.reply(f"Removed debt for {name}.")
+            else:
+                await ctx.reply(f"{name} did not have any debt.")
