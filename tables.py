@@ -13,8 +13,9 @@ async def on_ready():
         print("Error with main.db")
     async with aiosqlite.connect("main.db") as db:
         async with db.cursor() as cursor:
-            await cursor.execute('CREATE TABLE IF NOT EXISTS rulesTable (guild INTEGER, rules STRING)')
-            await cursor.execute('CREATE TABLE IF NOT EXISTS schedulesTable (guild INTEGER, timeBetween INTEGER, alarmTime DATETIME,currentIndex INTEGER,message STRING,list STRING, id INTEGER)')
-            await cursor.execute('CREATE TABLE IF NOT EXISTS alarmsTable (guild INTEGER, event STRING, date STRING, time STRING)')
-            await cursor.execute('CREATE TABLE IF NOT EXISTS restrictTable (guild INTEGER, category STRING,list STRING)')
+            await cursor.execute('CREATE TABLE IF NOT EXISTS rulesTable (guild INTEGER, rules TEXT)')
+            await cursor.execute('CREATE TABLE IF NOT EXISTS schedulesTable (guild INTEGER, timeBetween INTEGER, alarmTime DATETIME,currentIndex INTEGER,message TEXT,list TEXT, id INTEGER)')
+            await cursor.execute('CREATE TABLE IF NOT EXISTS alarmsTable (guild INTEGER, event TEXT, date TEXT, time TEXT)')
+            await cursor.execute('CREATE TABLE IF NOT EXISTS restrictTable (guild INTEGER, category TEXT,list TEXT)')
+            await cursor.execute('CREATE TABLE IF NOT EXISTS moneyTable (guild INTEGER, person TEXT, amount INTEGER)')
         await db.commit()
