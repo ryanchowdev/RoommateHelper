@@ -43,10 +43,9 @@ async def poll(ctx, vote: int=None, message="", *options):
       await ctx.send(':no_entry: Number of votes must be less than or equal to 10')
    else:
          
-      embed = discord.Embed(title=" Poll ", description = message)
+      embed = discord.Embed(title="RoommateHelper : Polls", description = message)
       
       for i in range(len(options)):
-         #print(i)
          index = i + 1
          embed.add_field(
             name=options[i], 

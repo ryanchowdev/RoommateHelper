@@ -48,31 +48,31 @@ async def helper(ctx,option=""):
       #embed.set_author(name="RoommateHelper : Help Menu")
       embed.add_field(
          name="**Weather**", 
-         value="=help weather", 
+         value="=helper weather", 
          inline=False
          )
       
       embed.add_field(
          name="**Money**", 
-         value="=help money", 
+         value="=helper money", 
          inline=False
          )
       
       embed.add_field(
          name="**Schedule**", 
-         value="=help schedule", 
+         value="=helper schedule", 
          inline=False
          )
       
       embed.add_field(
          name="**Alarm**", 
-         value="=help alarm", 
+         value="=helper alarm", 
          inline=False
          )
       
       embed.add_field(
          name="**Calculator**", 
-         value="=help calculator", 
+         value="=helper calculator", 
          inline=False
          )
       
