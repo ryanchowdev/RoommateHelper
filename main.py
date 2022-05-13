@@ -5,6 +5,7 @@ from discord.ext import commands, tasks
 from dotenv import load_dotenv
 import builtins
 
+
 # get token from .env file
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -27,6 +28,8 @@ import poll
 import rules
 import tables
 import restrict
+import music
+
 
 @bot.event
 async def on_ready():
