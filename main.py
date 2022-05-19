@@ -29,7 +29,7 @@ import rules
 import tables
 import restrict
 import music
-
+import gmaps
 
 @bot.event
 async def on_ready():
