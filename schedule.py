@@ -1,4 +1,3 @@
-from msilib.schema import Error
 from operator import index
 import discord
 import aiosqlite
