@@ -39,7 +39,7 @@ class ScheduleTests(IsolatedAsyncioTestCase):
 
     async def test_getSchedulerFunction(self):
         await scheduleFunctions.clearScheduleFunction(TESTID)
-        self.assertEqual("NO Schedules CURRENTLY",await scheduleFunctions.getScheduleFunction(TESTID))
+        self.assertEqual("No Schedules Currently",await scheduleFunctions.getScheduleFunction(TESTID))
         
 if __name__ == '__main__':
     unittest.main()

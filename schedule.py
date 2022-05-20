@@ -14,7 +14,7 @@ DATEFORMAT = "%Y-%m-%d %H:%M:%S"
 @bot.command()
 async def schedule(ctx, paramOne:str ,paramTwo:int, message:str, stringList:str = "", dateStart:str = ""):
     if type(paramTwo) != int:
-         await ctx.reply("Unrecognized time frame")
+         await ctx.reply("Unrecognized Time Frame")
     time = scheduleFunctions.convertToMinutes(paramOne,paramTwo)
     if time == FORMATERROR:
         await ctx.reply("Unrecognized. Please use m for minutes, h for hours, d for days instead of " + paramOne)
@@ -35,7 +35,7 @@ async def continueSchedule(ctx):
     if repeat:
         scheduledMessage.start(ctx)
     else:
-        await ctx.reply("No scheduled messages")
+        await ctx.reply("No Scheduled Messages")
 
 
 @bot.command()
@@ -85,15 +85,15 @@ async def scheduledMessage(ctx):
                     print(f"{channel} is the channel gotten")
                     if outcome<1:
                         if len(d[5]) == 0 and channel == None:
-                            await ctx.send(f"scheduled message: {d[4]}")
+                            await ctx.send(f"Scheduled Message: {d[4]}")
                         elif len(d[5]) == 0 and channel:
-                            await channel.send(f"scheduled message: {d[4]}")
+                            await channel.send(f"Scheduled Message: {d[4]}")
                         else:
                             l = d[5].split(" ")
                             if channel!=None:
-                                await channel.send(f"scheduled Message: {d[4]} {l[d[3]]}")
+                                await channel.send(f"Scheduled Message: {d[4]} {l[d[3]]}")
                             else:
-                                await ctx.send(f"scheduled Message: {d[4]} {l[d[3]]}")
+                                await ctx.send(f"Scheduled Message: {d[4]} {l[d[3]]}")
                             d[3] = (d[3]+1)%len(l)
                             await cursor.execute("UPDATE schedulesTable SET currentIndex = ? WHERE guild = ? AND id = ?",(d[3],ctx.guild.id,d[6]))
                         nextTime = datetime.now()+timedelta(minutes=d[1])
