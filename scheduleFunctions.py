@@ -98,10 +98,10 @@ async def getScheduleFunction(id):
                 string = "SCHEDULES\n"
                 for i in data:
                     print(i)
-                    string += f"{(i[4])} at {i[2]} id is {i[6]}\n"
+                    string += f"Message: {(i[4])} Next Time: {i[2][0:16]} ID: {i[6]}\n"
                 return string
             else:
-                return "NO Schedules CURRENTLY"
+                return "No Schedules Currently"
 
 async def getScheduleNum(id):
     async with aiosqlite.connect("main.db") as db:
