@@ -1,27 +1,21 @@
 import os
-import pickle
+import aiosqlite
 import urllib3
 import json
 from builtins import bot
 
+#sqlite
+DBFILE = "main.db"
+
 # https://openweathermap.org/api - Free weather API
 OPENWEATHER_KEY = os.getenv('OPENWEATHER_KEY')
-
-# using pickle to save/reload data
-# https://docs.python.org/3/library/pickle.html
-try:
-    user_data = pickle.load(open("user_data.p", "rb"))
-except:
-    user_data = {'user_city': None, 'unit_sys': 'imperial'}
-    pickle.dump(user_data, open("user_data.p", "wb"))
 
 units = {"imperial": {"temp": "F", "wind": "mi/h"},
          "metric": {"temp": "C", "wind": "m/s"}}
 
 
-def getWeather(city):
+def getWeather(city, unit_sys):
     """returns a string describing the current weather in the specified city."""
-    unit_sys = user_data['unit_sys']
     WEATHER_API = "https://api.openweathermap.org/data/2.5/weather?q=%s&appid=%s&units=%s" % (
         city, OPENWEATHER_KEY, unit_sys)
     http = urllib3.PoolManager()
@@ -49,14 +43,22 @@ async def setCity(ctx):
     """
     sets and locally saves the user specified city
     """
-    global user_data
     cmd = ctx.message.content.split(" ")
     if len(cmd) == 1:
         await ctx.reply("Usage:\n`=setCity <city>`")
     else:
-        user_data['user_city'] = " ".join(cmd[1:])
-        pickle.dump(user_data, open("user_data.p", "wb"))
-        await ctx.reply("Location set to " + user_data['user_city'])
+        city = " ".join(cmd[1:])
+        # update sqlite db
+        async with aiosqlite.connect("main.db") as db:
+            async with db.cursor() as cursor:
+                await cursor.execute("SELECT * FROM localeTable WHERE guild = ?", (ctx.guild.id,))
+                data = await cursor.fetchone()
+                if data:
+                    await cursor.execute("UPDATE localeTable SET city = ? WHERE guild = ?", (city, ctx.guild.id))
+                else:
+                    await cursor.execute("INSERT INTO localeTable (guild,city) VALUES (?, ?)", (ctx.guild.id, city))
+                await db.commit()
+        await ctx.reply(f"Location set to {city}")
 
 
 @bot.command()
@@ -64,21 +66,30 @@ async def setUnits(ctx):
     """
     sets and locally saves the user specified temperature unit
     """
-    global user_data
     cmd = ctx.message.content.split(" ")
     if len(cmd) != 2:
         await ctx.reply("Usage:\n`=setUnits (i)mperial OR (m)etric`")
         return
     unit = cmd[1][0].lower()
     if unit == 'i':
-        user_data['unit_sys'] = 'imperial'
+        unit_sys = 'imperial'
     elif unit == 'm':
-        user_data['unit_sys'] = 'metric'
+        unit_sys = 'metric'
     else:
         await ctx.reply("Usage:\n`=setUnits (i)mperial OR (m)etric`")
         return
-    pickle.dump(user_data, open("user_data.p", "wb"))
-    await ctx.reply("Units set to " + user_data['unit_sys'])
+
+    # update sqlite db
+    async with aiosqlite.connect("main.db") as db:
+        async with db.cursor() as cursor:
+            await cursor.execute("SELECT * FROM localeTable WHERE guild = ?", (ctx.guild.id,))
+            data = await cursor.fetchone()
+            if data:
+                await cursor.execute("UPDATE localeTable SET unit_sys = ? WHERE guild = ?", (unit_sys, ctx.guild.id))
+            else:
+                await cursor.execute("INSERT INTO localeTable (guild,unit_sys) VALUES (?, ?)", (ctx.guild.id, unit_sys))
+            await db.commit()
+    await ctx.reply(f"Units set to {unit_sys}")
 
 
 @bot.command()
@@ -86,7 +97,15 @@ async def weather(ctx):
     """
     replies to the user with the current weather in their city
     """
-    if user_data['user_city'] is None:
-        await ctx.reply("Please set your city first with `=setCity <city>`")
-    else:
-        await ctx.reply(getWeather(user_data['user_city']))
+    async with aiosqlite.connect(DBFILE) as db:
+        async with db.cursor() as cursor:
+            await cursor.execute("SELECT * FROM localeTable WHERE guild = ?",(ctx.guild.id,))
+            await db.commit()
+            data = await cursor.fetchone()
+            if data:
+                city = data[1]
+                # get unit system from db, default to imperial
+                unit_sys = data[2] if data[2] else 'imperial'
+                await ctx.reply(getWeather(city, unit_sys))
+            else:
+                await ctx.reply("Please set your city first with `=setCity <city>`")
