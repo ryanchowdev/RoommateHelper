@@ -12,7 +12,7 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 
 #variables
 PREFIX = '='
-bot = commands.Bot(command_prefix=PREFIX)
+bot = commands.Bot(command_prefix=PREFIX, case_insensitive=True)
 
 builtins.bot = bot
 
