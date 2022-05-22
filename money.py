@@ -1,93 +1,59 @@
-import os
-import pickle
-import aiosqlite
-from pathlib import Path
 from builtins import bot
+import money_functions
 
 DBFILE = "main.db"
 
 @bot.command()
-async def debt(ctx, name:str, amt):
+async def debt(ctx, name:str, amt, *note):
+    """Set debt for a person. Usage: debt name amt note(optional)"""
     try:
         amt = round(float(amt), 2)
         assert amt > 0
-        async with aiosqlite.connect(DBFILE) as db:
-            async with db.cursor() as cursor:
-                # get debt for name
-                await cursor.execute("SELECT * FROM moneyTable WHERE guild = ? AND person = ?", (ctx.guild.id, name))
-                data = await cursor.fetchone()
-                if data:
-                    # update if record exists
-                    await cursor.execute("UPDATE moneyTable SET amount = ? WHERE guild = ? AND person = ?", (amt, ctx.guild.id, name))
-                else:
-                    # insert if record does not exist
-                    await cursor.execute("INSERT INTO moneyTable (guild,person,amount) VALUES (?,?,?)", (ctx.guild.id, name, amt))
-                await db.commit()
-                await ctx.reply(f"Added debt for {name} of amount ${amt:.2f}.")
+        my_note = " ".join(note) if len(note) > 0 else "No note provided"
+        await ctx.reply(await money_functions.set_debt(name, amt, my_note, ctx.guild.id))
     except AssertionError:
         await ctx.reply("Debt amount must be positive (>0).")
     except:
-        await ctx.reply("Invalid command. Usage: debt name amount")
+        await ctx.reply("Invalid command. Usage: debt name amount note(optional)")
 
 @bot.command()
 async def changedebt(ctx, name:str, amt):
+    """Change debt for a person. Usage: name amt"""
     try:
         amt = round(float(amt), 2)
-        async with aiosqlite.connect(DBFILE) as db:
-            async with db.cursor() as cursor:
-                new_debt = 0
-                # get debt for name
-                await cursor.execute("SELECT * FROM moneyTable WHERE guild = ? AND person = ?", (ctx.guild.id, name))
-                data = await cursor.fetchone()
-                if data:
-                    current_debt = data[2]
-                    new_debt = max(current_debt + amt, 0.00)
-                    # update if record exists
-                    await cursor.execute("UPDATE moneyTable SET amount = ? WHERE guild = ? AND person = ?", (new_debt, ctx.guild.id, name))
-                else:
-                    new_debt = amt
-                    # insert if record does not exist
-                    await cursor.execute("INSERT INTO moneyTable (guild,person,amount) VALUES (?,?,?)", (ctx.guild.id, name, new_debt))
-                await db.commit()
-                await ctx.reply(f"Adjusted debt for {name} by {amt:.2f}. New debt: {new_debt:.2f}")
+        await ctx.reply(await money_functions.change_debt(name, amt, ctx.guild.id))
     except:
         await ctx.reply("Invalid command. Usage: changedebt name amount")
 
 @bot.command()
+async def changenote(ctx, name:str, *note):
+    """Change note for a person. Usage: changenote name note"""
+    my_note = " ".join(note)
+    try:
+        await ctx.reply(await money_functions.change_note(name, my_note, ctx.guild.id))
+    except:
+        await ctx.reply("Invalid command. Usage: changenote name note")
+
+@bot.command()
 async def checkdebt(ctx):
-    async with aiosqlite.connect(DBFILE) as db:
-        async with db.cursor() as cursor:
-            # get debts for current server
-            await cursor.execute("SELECT * FROM moneyTable WHERE guild = ?", (ctx.guild.id,))
-            data = await cursor.fetchall()
-            if data:
-                message = "**Current Debts**\n"
-                for d in data:
-                    message += f"{d[1]} owes ${str(d[2])}.\n"
-                await ctx.reply(message)
-            else:
-                await ctx.reply("No current debts.")
+    """Check all debts. Usage: checkdebt"""
+    try:
+        await ctx.reply(await money_functions.check_debt(ctx.guild.id))
+    except:
+        await ctx.reply("Invalid command. Usage: checkdebt")
 
 @bot.command()
 async def cleardebt(ctx):
-    async with aiosqlite.connect(DBFILE) as db:
-        async with db.cursor() as cursor:
-            # delete records for this guild
-            await cursor.execute("DELETE FROM moneyTable WHERE guild = ?", (ctx.guild.id,))
-        await db.commit()
-        await ctx.reply("All debts cleared.")
+    """Clear all debts. Usage: cleardebt"""
+    try:
+        await ctx.reply(await money_functions.clear_debt(ctx.guild.id))
+    except:
+        await ctx.reply("Invalid command. Usage: cleardebt")
 
 @bot.command()
 async def removedebt(ctx, name:str):
-    async with aiosqlite.connect(DBFILE) as db:
-        async with db.cursor() as cursor:
-            # get debt for name
-            await cursor.execute("SELECT * FROM moneyTable WHERE guild = ? AND person = ?", (ctx.guild.id, name))
-            data = await cursor.fetchone()
-            if data:
-                # delete record for this name
-                await cursor.execute("DELETE FROM moneyTable WHERE guild = ? AND person = ?", (ctx.guild.id, name))
-                await db.commit()
-                await ctx.reply(f"Removed debt for {name}.")
-            else:
-                await ctx.reply(f"{name} did not have any debt.")
+    """Remove debt for a person. Usage: removedebt name"""
+    try:
+        await ctx.reply(await money_functions.remove_debt(name, ctx.guild.id))
+    except:
+        await ctx.reply("Invalid command. Usage: removedebt name")
