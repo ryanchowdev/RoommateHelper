@@ -1,14 +1,24 @@
 from unittest import IsolatedAsyncioTestCase
 import unittest
+from moneyFunctions import DBFILE
 import scheduleFunctions
 from datetime import datetime , date, timedelta 
+import tables
+import aiosqlite
 
 TESTID = 1 #Going under assumption that no discord server has guild id of TESTID
 EXPECTEDSCHEDULES = 1
 TESTTIME = 5
 TIMEFORMAT = "%m/%d/%Y %H:%M"
-
+DBFILE = "main.db"
 class ScheduleTests(IsolatedAsyncioTestCase):
+
+    async def check_db_entry(self, guild_id, name):
+        await tables.create_tables()
+        async with aiosqlite.connect(DBFILE) as db:
+            async with db.cursor() as cursor:
+                await cursor.execute("SELECT guild, timeBetween, alarmTime, currentIndex, message, list FROM schedulesTable WHERE guild = ? AND message = ?", (guild_id, name))
+                return await cursor.fetchone()  
 
     def test(self):
         self.assertTrue(True)
@@ -28,6 +38,7 @@ class ScheduleTests(IsolatedAsyncioTestCase):
         await scheduleFunctions.clearScheduleFunction(TESTID)
         self.assertEqual("Scheduled a message every 1 m Message: MESSAGE", await scheduleFunctions.insertScheduler(TESTID,TESTTIME,"5/16/2022 13:01","m",1,"MESSAGE",""))
         self.assertEqual(1,await scheduleFunctions.getScheduleNum(TESTID))
+        self.assertEqual((1, 5, '5/16/2022 13:01', 0, 'MESSAGE', ''), await self.check_db_entry(TESTID, 'MESSAGE'))
         await scheduleFunctions.clearScheduleFunction(TESTID)
 
     async def test_clearSchedulerFunction(self):
