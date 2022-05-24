@@ -3,30 +3,19 @@ from discord.ext import commands
 import discord
 import random
 from builtins import bot
+import coinFunctions
    
+HEADS = 0
+TAILS = 1
+
 @bot.command()
 async def flip(ctx):
-   res = random.randint(0,1)
    
-   embed=discord.Embed(
-         title="RoommateHelper : Coin Flip", 
-         description="",
-         color=discord.Color.blue()
-      )
+   res = random.randint(HEADS,TAILS)
    
-   if res == 0:
-      embed.add_field(
-         name="You got:", 
-         value="Heads", 
-         inline=False
-      )
-      embed.set_image(url="https://i.imgur.com/DsLFwRO.png")
+   if res == HEADS:
+      embed=coinFunctions.displayHeads()
    else:
-      embed.add_field(
-         name="You got:", 
-         value="Tails", 
-         inline=False
-      )
-      embed.set_image(url="https://i.imgur.com/3Xqr7Eh.png")
+      embed=coinFunctions.displayTails()
    
    await ctx.send(embed=embed)
