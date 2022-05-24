@@ -36,6 +36,7 @@ def dateConversion(dateStart:str):
             if assignedTime < currentTime:
                 print("GIVEN TIME TOO LOW")
                 return ERRORNUM
+            currentTime = assignedTime
         except:
             print("INCORRECT FORMAT")
             return ERRORNUM
