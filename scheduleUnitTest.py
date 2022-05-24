@@ -1,6 +1,5 @@
 from unittest import IsolatedAsyncioTestCase
 import unittest
-from moneyFunctions import DBFILE
 import scheduleFunctions
 from datetime import datetime , date, timedelta 
 import tables
