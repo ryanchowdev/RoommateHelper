@@ -47,7 +47,8 @@ async def change_note(name, note, guild_id):
                 await cursor.execute("UPDATE moneyTable SET reason = ? WHERE guild = ? AND person = ?", (note, guild_id, name))
             else:
                 # Insert if record does not exist
-                await cursor.execute("INSERT INTO moneyTable (guild,person,reason) VALUES (?,?,?)", (guild_id, name, note))
+                # Default to $0
+                await cursor.execute("INSERT INTO moneyTable (guild,person,amount,reason) VALUES (?,?,?,?)", (guild_id, name, 0, note))
             await db.commit()
     return f"Adjusted note for {name}. New note: {note}."
 
