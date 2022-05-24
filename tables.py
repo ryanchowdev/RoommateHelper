@@ -1,7 +1,4 @@
-import os
 import aiosqlite
-from pathlib import Path
-from builtins import bot
  
 DBFILE = "main.db"
 
