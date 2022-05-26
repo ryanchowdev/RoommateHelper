@@ -57,9 +57,20 @@ async def playMusic(ctx,url):
             info = ydl.extract_info(q[0],download=False)
             url2 = info['formats'][0]['url']
             source = await discord.FFmpegOpusAudio.from_probe(url2,**FMMPEG_OPTIONS)
-            vc.play(source)
-            del(q[0])
+            vc.play(source, after=lambda e: asyncio.run_coroutine_threadsafe(play_next(ctx),bot.loop))
+
     
+async def play_next(ctx):
+    if len(q) >= 1:
+        del q[0]
+        with youtube_dl.YoutubeDL(YDL_OPTIONS) as ydl:
+            info = ydl.extract_info(q[0],download=False)
+            url2 = info['formats'][0]['url']
+            vc = ctx.voice_client
+            url2 = info['formats'][0]['url']
+            source = await discord.FFmpegOpusAudio.from_probe(url2,**FMMPEG_OPTIONS)
+            vc.play(source, after=lambda e: asyncio.run_coroutine_threadsafe(play_next(ctx),bot.loop))
+        asyncio.run_coroutine_threadsafe(ctx.send("No more songs in queue."))
 
 def checkPlayings(ctx):
     vc = ctx.voice_client
@@ -68,7 +79,6 @@ def checkPlayings(ctx):
 @bot.command()
 async def checkPlaying(ctx):
     await ctx.send(f"Playing = {checkPlayings(ctx)}")
-
 
 @bot.command()
 async def musicPause(ctx):
@@ -93,7 +103,6 @@ async def musicRemove(ctx,num):
         await ctx.send(f"Queue is {q}")
     except:
         await ctx.send("Error with removing from queue")
-
 
 @bot.command()
 async def musicQueue(ctx):
