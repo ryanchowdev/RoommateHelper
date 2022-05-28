@@ -30,6 +30,7 @@ import tables
 import restrict
 import music
 import gmaps
+import lists
 
 @bot.event
 async def on_ready():
