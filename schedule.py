@@ -13,6 +13,7 @@ DATEFORMAT = "%Y-%m-%d %H:%M:%S"
 
 @bot.command()
 async def schedule(ctx, paramOne:str ,paramTwo:int, message:str, stringList:str = "", dateStart:str = ""):
+    """Schedule a message to occur repeatedly. Check doc for more info. Usage: schedule m 1 'Message' <optional string list> <optional date/time to start>"""
     if type(paramTwo) != int:
          await ctx.reply("Unrecognized Time Frame")
     time = scheduleFunctions.convertToMinutes(paramOne,paramTwo)
@@ -31,6 +32,7 @@ async def schedule(ctx, paramOne:str ,paramTwo:int, message:str, stringList:str 
 
 @bot.command()
 async def continueSchedule(ctx):
+    """Continues the schedules. If scheduled message past, repeats until it is the past the current time. Usage: continueSchedule"""
     repeat = await scheduleFunctions.repeatUntilPresentFunction(ctx.guild.id)
     if repeat:
         scheduledMessage.start(ctx)
@@ -40,20 +42,24 @@ async def continueSchedule(ctx):
 
 @bot.command()
 async def stopSchedule(ctx):
+    """Stops the scheduler from running. Usage: stopSchedule"""
     scheduledMessage.cancel()
     await ctx.reply("Stopped schedule(s)")
 
 @bot.command()
 async def deleteSchedule(ctx,id:int):
+    """Deletes schedule based off of schedule id. Usage: deleteSchedule 1337"""
     await ctx.reply(await scheduleFunctions.deleteScheduleFunction(ctx.guild.id,id))
 
 @bot.command()
 async def clearSchedule(ctx):
+    """Clears all schedules. Usage: clearSchedule"""
     scheduledMessage.cancel()
     await ctx.reply(await scheduleFunctions.clearScheduleFunction(ctx.guild.id))
 
 @bot.command()
 async def getSchedule(ctx):
+    """Gives a list of all schedules. Usage: getSchedule"""
     await ctx.reply(await scheduleFunctions.getScheduleFunction(ctx.guild.id))
                  
 

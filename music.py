@@ -33,6 +33,7 @@ def addEntry(id):
 
 @bot.command()
 async def musicJoin(ctx):
+    """Gets the music bot to join the voice channel the user is in. Usage: musicJoin"""
     if ctx.author.voice is None:
        await ctx.send("Join a voice channel before asking me to join")
     voice_channel = ctx.author.voice.channel
@@ -43,10 +44,12 @@ async def musicJoin(ctx):
     
 @bot.command()
 async def musicLeave(ctx):
+    """Gets the music bot to leave the discord voice channel. Usage: musicLeave"""
     await ctx.voice_client.disconnect()
     
 @bot.command()
 async def playMusic(ctx,url):
+    """Plays music or adds it to the queue to be played. Usage: playMusic https://www.youtube.com/watch?v=360c_SkOByI"""
     if ctx.author.voice is None:
        await ctx.send("Join a voice channel before asking me to join")
     voice_channel = ctx.author.voice.channel
@@ -82,12 +85,15 @@ def checkPlayings(ctx):
     vc = ctx.voice_client
     return vc.is_playing()
 
-@bot.command()
-async def checkPlaying(ctx):
-    await ctx.send(f"Playing = {checkPlayings(ctx)}")
+# This command is used for testing purposes only
+#@bot.command()
+#async def checkPlaying(ctx):
+#    """Checks if the music bot is playing. Usage: checkPlaying"""
+#    await ctx.send(f"Playing = {checkPlayings(ctx)}")
 
 @bot.command()
 async def musicPause(ctx):
+    """Pauses whatever the music bot is playing. Usage: musicPause"""
     try:
         await ctx.voice_client.pause()
     except:
@@ -96,6 +102,7 @@ async def musicPause(ctx):
 
 @bot.command()
 async def musicResume(ctx):
+    """Resumes if music bot is paused. Usage: musicResume"""
     try:
         await ctx.voice_client.resume()
     except:
@@ -104,6 +111,7 @@ async def musicResume(ctx):
         
 @bot.command()
 async def musicRemove(ctx,num):
+    """Removes the url from the queue. Usage: musicRemove 1"""
     try:
         del(q[ctx.guild.id][int(num)])
         await ctx.send(f"Queue is {q[ctx.guild.id]}")
@@ -112,6 +120,7 @@ async def musicRemove(ctx,num):
 
 @bot.command()
 async def musicQueue(ctx):
+    """Prints the queue for the musicbot. Usage: musicQueue"""
     try:
         await ctx.send(f"Queue is {q[ctx.guild.id]}")
     except:
@@ -119,4 +128,5 @@ async def musicQueue(ctx):
 
 @bot.command()
 async def clearQueue(ctx):
+    """Clears the queue for the music bot. Usage: clearQueue"""
     q[ctx.guild.id] = []
