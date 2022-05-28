@@ -16,4 +16,5 @@ async def create_tables():
             await cursor.execute('CREATE TABLE IF NOT EXISTS restrictTable (guild INTEGER, category TEXT,list TEXT)')
             await cursor.execute('CREATE TABLE IF NOT EXISTS moneyTable (guild INTEGER, person TEXT, amount REAL, reason TEXT)')
             await cursor.execute('CREATE TABLE IF NOT EXISTS localeTable (guild INTEGER, city TEXT, unit_sys TEXT)')
+            await cursor.execute('CREATE TABLE IF NOT EXISTS listsTable (guild INTEGER, name TEXT, postid INTEGER, note TEXT)')
         await db.commit()
