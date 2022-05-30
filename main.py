@@ -40,6 +40,8 @@ async def on_ready():
     print("Creating database tables now...\n")
     await tables.create_tables()
     print("Tables created.\n")
+    await schedule.scheduledMessage.start()
+    print("Scheduler is now active")
 
 @bot.command()
 async def hello(ctx):
