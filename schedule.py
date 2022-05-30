@@ -10,15 +10,12 @@ import scheduleFunctions
 
 FORMATERROR = -1
 DATEFORMAT = "%Y-%m-%d %H:%M:%S"
-CTXList = []
 
 
 @bot.command()
 async def schedule(ctx, paramOne:str ,paramTwo:int, message:str, stringList:str = "", dateStart:str = ""):
     """Schedule a message to occur repeatedly. Check doc for more info. Usage: schedule m 1 'Message' <optional string list> <optional date/time to start>"""
-    if ctx not in CTXList:
-        CTXList.append(ctx)
-
+    scheduleFunctions.addToActive(ctx)
     if type(paramTwo) != int:
          await ctx.reply("Unrecognized Time Frame")
     time = scheduleFunctions.convertToMinutes(paramOne,paramTwo)
@@ -30,30 +27,19 @@ async def schedule(ctx, paramOne:str ,paramTwo:int, message:str, stringList:str 
         await ctx.reply("Error in assigning time. Please use correct format (%Y-%m-%d, %H:%M) /a future time period")
         return 
     await ctx.reply(await scheduleFunctions.insertScheduler(ctx.guild.id,time,finalTime,paramOne,paramTwo,message,stringList))
-    try:
-        scheduledMessage.start(ctx)
-    except:
-        print("Already running scheduledMessage")
 
 @bot.command()
 async def continueSchedule(ctx):
     """Continues the schedules. If scheduled message past, repeats until it is the past the current time. Usage: continueSchedule"""
-    if ctx not in CTXList:
-        CTXList.append(ctx)
-
+    scheduleFunctions.addToActive(ctx)
     repeat = await scheduleFunctions.repeatUntilPresentFunction(ctx.guild.id)
-    if repeat:
-        try:
-            scheduledMessage.start(ctx)
-        except:
-            print("scheduler already running")
-    else:
+    if not repeat:
         await ctx.reply("No Scheduled Messages")
 
 @bot.command()
 async def stopSchedule(ctx):
     """Stops the scheduler from running. Usage: stopSchedule"""
-    list.remove(ctx)
+    scheduleFunctions.removeFromActive(ctx)
     await ctx.reply("Stopped schedule(s)")
 
 @bot.command()
@@ -64,7 +50,10 @@ async def deleteSchedule(ctx,id:int):
 @bot.command()
 async def clearSchedule(ctx):
     """Clears all schedules. Usage: clearSchedule"""
-    scheduledMessage.cancel()
+    try:
+        scheduleFunctions.removeFromActive(ctx)
+    except:
+        print(f"{ctx} was never active")
     await ctx.reply(await scheduleFunctions.clearScheduleFunction(ctx.guild.id))
 
 @bot.command()
@@ -74,15 +63,15 @@ async def getSchedule(ctx):
                  
 
 @tasks.loop(minutes=1)
-async def scheduledMessage(ctx):
+async def scheduledMessage():
     async with aiosqlite.connect("main.db") as db:
         async with db.cursor() as cursor:
-            for cElement in CTXList:
+            listCTX = scheduleFunctions.getCTXList()
+            print(f"CTXLIST is {listCTX}")
+            for cElement in listCTX:
                 await cursor.execute("SELECT * from schedulesTable WHERE guild = ?",(cElement.guild.id,))
                 data = await cursor.fetchall()
-                if not data:
-                    scheduledMessage.cancel()
-                else:
+                if data:
                     for d in data:
                         d = list(d)
                         try:
