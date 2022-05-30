@@ -35,6 +35,12 @@ def displayIntroPage():
         )
     
     embed.add_field(
+        name="**Lists**", 
+        value="=help lists", 
+        inline=False
+        )
+    
+    embed.add_field(
         name="**Money**", 
         value="=help money", 
         inline=False
@@ -359,7 +365,6 @@ def displayWeatherPage():
         color=discord.Color.blue()
         )
     
-    #embed.set_author(name="RoommateHelper : Weather")
     embed.add_field(
         name="**setCity**", 
         value="Sets and locally saves the user specified city", 
@@ -375,6 +380,51 @@ def displayWeatherPage():
     embed.add_field(
         name="**weather**", 
         value="Replies to the user with the current weather in their city", 
+        inline=False
+        )
+    
+    return embed
+
+def displayListsPage():
+    embed=discord.Embed(
+        title="RoommateHelper : Lists ( = )", 
+        description="",
+        color=discord.Color.blue()
+        )
+    
+    embed.add_field(
+        name="**listadd <name> <note>**", 
+        value="dds note to the list with name. Creates the list if it does not exist.", 
+        inline=False
+        )
+    
+    embed.add_field(
+        name="**listedit <name> <id> <note>**", 
+        value="dits the note at id in the named list.", 
+        inline=False
+        )
+    
+    embed.add_field(
+        name="**listremove <name> <id>**", 
+        value="Removes the note at id in the named list.", 
+        inline=False
+        )
+    
+    embed.add_field(
+        name="**listdelete <name>**", 
+        value="Deletes the named list", 
+        inline=False
+        )
+    
+    embed.add_field(
+        name="**listclear**", 
+        value="Delete all lists.", 
+        inline=False
+        )
+    
+    embed.add_field(
+        name="**listcheck <list (optional)>**", 
+        value="heck the named list. If no name provided, check all lists.", 
         inline=False
         )
     
