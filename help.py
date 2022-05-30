@@ -18,6 +18,7 @@ RESTRICT = 9
 RULES = 10
 SCHEDULE = 11
 WEATHER = 12
+LISTS = 13
 
 switcher = {
    "": DEFAULT,
@@ -31,7 +32,8 @@ switcher = {
    "restrict": RESTRICT,
    "rules": RULES,
    "schedule": SCHEDULE,
-   "weather": WEATHER
+   "weather": WEATHER,
+   "lists": LISTS
 }
 
 @bot.command()
@@ -62,5 +64,7 @@ async def help(ctx,option=""):
       embed=helpFunctions.displaySchedulePage()
    elif number == WEATHER:
       embed=helpFunctions.displayWeatherPage()
+   elif number == LISTS:
+      embed=helpFunctions.displayListsPage()
       
    await ctx.send(embed=embed)
