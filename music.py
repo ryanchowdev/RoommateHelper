@@ -68,7 +68,14 @@ async def playMusic(ctx,url):
             source = await discord.FFmpegOpusAudio.from_probe(url2,**FMMPEG_OPTIONS)
             vc.play(source, after=lambda e: asyncio.run_coroutine_threadsafe(play_next(ctx),bot.loop))
 
-    
+@bot.command()
+async def musicSkip(ctx):
+    if len(q[ctx.guild.id])>0:
+        await play_next(ctx)
+    else:
+        ctx.voice_client.stop()
+    await ctx.reply("Skipped")
+
 async def play_next(ctx):
     if len(q[ctx.guild.id]) >= 1:
         del q[ctx.guild.id][0]
@@ -79,7 +86,7 @@ async def play_next(ctx):
             url2 = info['formats'][0]['url']
             source = await discord.FFmpegOpusAudio.from_probe(url2,**FMMPEG_OPTIONS)
             vc.play(source, after=lambda e: asyncio.run_coroutine_threadsafe(play_next(ctx),bot.loop))
-        asyncio.run_coroutine_threadsafe(ctx.send("No more songs in queue."),bot.loop)
+        asyncio.run_coroutine_threadsafe(ctx.send("No more songs in queue after this one."),bot.loop)
 
 def checkPlayings(ctx):
     vc = ctx.voice_client
