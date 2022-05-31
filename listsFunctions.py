@@ -22,7 +22,7 @@ async def list_add(name, note, guild_id):
                 my_id = 1
                 await cursor.execute("INSERT INTO listsTable (guild,name,postid,note) VALUES (?,?,?,?)", (guild_id, name, my_id, note))
             await db.commit()
-    return f"Added to list '{name}' the note:\n{my_id}) {note}"
+    return f"Added to list \"{name}\" the note:\n{my_id}) {note}"
 
 async def list_edit(name, post_id, note, guild_id):
     async with aiosqlite.connect(DBFILE) as db:
