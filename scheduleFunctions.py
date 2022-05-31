@@ -12,7 +12,11 @@ CTXList = []
 
 # Adds current ctx to active list
 def addToActive(ctx):
-    if ctx not in CTXList:
+    check = False
+    for i in range(0, len(CTXList)):
+        if ctx.guild.id == CTXList[i].guild.id:
+            check = True
+    if not check:
         CTXList.append(ctx)
 
 # Returns ctx list
@@ -54,11 +58,9 @@ def dateConversion(dateStart:str):
         try:
             assignedTime = datetime.strptime(dateStart, "%m/%d/%Y %H:%M")
             if assignedTime < currentTime:
-                print("GIVEN TIME TOO LOW")
                 return ERRORNUM
             currentTime = assignedTime
         except:
-            print("INCORRECT FORMAT")
             return ERRORNUM
     return currentTime
 
@@ -130,7 +132,6 @@ async def getScheduleFunction(id):
             if data:
                 string = "SCHEDULES\n"
                 for i in data:
-                    print(i)
                     string += f"Message: {(i[4])} Next Time: {i[2][0:16]} ID: {i[6]}\n"
                 return string
             else:

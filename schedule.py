@@ -67,7 +67,6 @@ async def scheduledMessage():
     async with aiosqlite.connect("main.db") as db:
         async with db.cursor() as cursor:
             listCTX = scheduleFunctions.getCTXList()
-            print(f"CTXLIST is {listCTX}")
             for cElement in listCTX:
                 await cursor.execute("SELECT * from schedulesTable WHERE guild = ?",(cElement.guild.id,))
                 data = await cursor.fetchall()
@@ -80,15 +79,12 @@ async def scheduledMessage():
                             expectedTime = datetime.strptime(d[2],"%Y-%m-%d %H:%M:%S.%f")
                         currentTime = datetime.strptime(datetime.now().strftime("%Y-%m-%d, %H:%M"),"%Y-%m-%d, %H:%M")
                         outcome = int((expectedTime-currentTime).total_seconds() / 60)
-                        print(f"{d} and time diff is {outcome}")
-
                         await cursor.execute("SELECT list from restrictTable WHERE guild = ? AND category = ?",(cElement.guild.id,"schedule"))
                         c = await cursor.fetchone()
                         if c:
                             channel = discord.utils.get(cElement.guild.text_channels, name=c[0])
                         else:
                             channel = None
-                        print(f"{channel} is the channel gotten")
                         if outcome<1:
                             if len(d[5]) == 0 and channel == None:
                                 await cElement.send(f"Scheduled Message: {d[4]}")
