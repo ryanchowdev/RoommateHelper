@@ -70,10 +70,7 @@ async def playMusic(ctx,url):
 
 @bot.command()
 async def musicSkip(ctx):
-    if len(q[ctx.guild.id])>0:
-        await play_next(ctx)
-    else:
-        ctx.voice_client.stop()
+    ctx.voice_client.stop()
     await ctx.reply("Skipped")
 
 async def play_next(ctx):
