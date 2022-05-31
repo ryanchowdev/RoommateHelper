@@ -16,6 +16,7 @@ ERROR_EXCEED_MAX_VOTES = -3
 
 @bot.command()
 async def poll(ctx, vote: int=None, message="", *options):
+   """Creates a poll based on input. Displays help menu if no input. Usage: poll numOfVotes message listOfOptions """
    
    reactions = ["1️⃣","2️⃣","3️⃣","4️⃣","5️⃣","6️⃣","7️⃣","8️⃣","9️⃣","🔟"]
    if vote == None:

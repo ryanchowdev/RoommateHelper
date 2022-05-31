@@ -14,6 +14,7 @@ HASLETTERS = -2
 
 @bot.command()
 async def calc(ctx,*,equation=""):
+   """Calculates simple equations by parsing input. Usage: calc equation"""
    checkInputFlag = calcFunctions.checkValidInput(equation)
    
    if checkInputFlag == VALID:
