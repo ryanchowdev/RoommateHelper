@@ -65,7 +65,7 @@ class ListsTests(unittest.IsolatedAsyncioTestCase):
         # Attempt to remove non-existent entry: name='four' postid=1
         self.assertEqual('Did not find post 1 in list: four.',
             await listsFunctions.list_remove('four', 1, TESTID))
-        # Add the entry
+        # Add the entry to four
         await listsFunctions.list_add('four', '1st note for four', TESTID)
         result = await self.check_db_entry(TESTID, 'four', 1)
         self.assertEqual('four', result[1])
@@ -75,21 +75,17 @@ class ListsTests(unittest.IsolatedAsyncioTestCase):
         await listsFunctions.list_remove('four', 1, TESTID)
         result = await self.check_db_entry(TESTID, 'four', 1)
         self.assertIsNone(result)
-
-    async def test_list_delete(self):
-        # Clear the db before starting
-        await listsFunctions.list_clear(TESTID)
         # Attempt to delete non-existent list: name='five'
         self.assertEqual('Did not find list: five.',
-            await listsFunctions.list_delete('five', TESTID))
-        # Create the list by adding a note
+            await listsFunctions.list_remove('five', -1, TESTID))
+        # Add the entry to five
         await listsFunctions.list_add('five', '1st note for five', TESTID)
         result = await self.check_db_entry(TESTID, 'five', 1)
         self.assertEqual('five', result[1])
         self.assertEqual(1, result[2])
         self.assertEqual('1st note for five', result[3])
-        # Delete list
-        await listsFunctions.list_delete('five', TESTID)
+        # Remove the list
+        await listsFunctions.list_remove('five', -1, TESTID)
         result = await self.check_db_entry(TESTID, 'five', 1)
         self.assertIsNone(result)
 

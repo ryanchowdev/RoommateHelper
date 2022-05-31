@@ -164,7 +164,7 @@ def displayMoneyPage():
         )
 
     embed.add_field(
-        name="**debt <name> <amount> <note>**", 
+        name="**setdebt <name> <amount> <note>**", 
         value="Set debt for a person. Note is optional", 
         inline=False
         )
@@ -393,38 +393,32 @@ def displayListsPage():
         )
     
     embed.add_field(
-        name="**listadd <name> <note>**", 
-        value="dds note to the list with name. Creates the list if it does not exist.", 
+        name="**addlist <name> <note>**", 
+        value="Adds note to the list with name. Creates the list if it does not exist.", 
         inline=False
         )
     
     embed.add_field(
-        name="**listedit <name> <id> <note>**", 
-        value="dits the note at id in the named list.", 
+        name="**editlist <name> <id> <note>**", 
+        value="Edits the note at id in the named list.", 
         inline=False
         )
     
     embed.add_field(
-        name="**listremove <name> <id>**", 
-        value="Removes the note at id in the named list.", 
+        name="**removelist <name> <id (optional)>**", 
+        value="Removes the note at id in the named list. If no id provided, delete the named list.", 
         inline=False
         )
     
     embed.add_field(
-        name="**listdelete <name>**", 
-        value="Deletes the named list", 
-        inline=False
-        )
-    
-    embed.add_field(
-        name="**listclear**", 
+        name="**clearlist**", 
         value="Delete all lists.", 
         inline=False
         )
     
     embed.add_field(
-        name="**listcheck <list (optional)>**", 
-        value="heck the named list. If no name provided, check all lists.", 
+        name="**checklist <list (optional)>**", 
+        value="Check the named list. If no name provided, check all lists.", 
         inline=False
         )
     

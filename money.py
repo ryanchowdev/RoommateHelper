@@ -4,8 +4,8 @@ import moneyFunctions
 DBFILE = "main.db"
 
 @bot.command()
-async def debt(ctx, name:str, amt, *note):
-    """Set debt for a person. Usage: debt name amt note(optional)"""
+async def setdebt(ctx, name:str, amt, *note):
+    """Set debt for a person. Usage: setdebt name amt note(optional)"""
     try:
         amt = round(float(amt), 2)
         assert amt > 0
@@ -14,7 +14,7 @@ async def debt(ctx, name:str, amt, *note):
     except AssertionError:
         await ctx.reply("Debt amount must be positive (>0).")
     except:
-        await ctx.reply("Invalid command. Usage: debt name amount note(optional)")
+        await ctx.reply("Invalid command. Usage: setdebt name amount note(optional)")
 
 @bot.command()
 async def changedebt(ctx, name:str, amt):
