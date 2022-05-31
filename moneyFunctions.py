@@ -15,7 +15,7 @@ async def set_debt(name, amt, note, guild_id):
                 # Insert if record does not exist
                 await cursor.execute("INSERT INTO moneyTable (guild,person,amount,reason) VALUES (?,?,?,?)", (guild_id, name, amt, note))
             await db.commit()
-    return f"Added debt for {name} of amount ${amt:.2f} with note: {note}."
+    return f"Set debt for {name} of amount ${amt:.2f} with note: {note}."
 
 async def change_debt(name, amt, guild_id):
     async with aiosqlite.connect(DBFILE) as db:

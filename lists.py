@@ -4,9 +4,9 @@ import listsFunctions
 DBFILE = "main.db"
 
 @bot.command()
-async def listadd(ctx, name:str, *note):
+async def addlist(ctx, name:str, *note):
     """Adds note to the list with name. Creates the list if it does not exist.
-        Usage: listadd name note"""
+        Usage: addlist name note"""
     try:
         my_note = " ".join(note)
         if not my_note:
@@ -14,12 +14,12 @@ async def listadd(ctx, name:str, *note):
         else:
             await ctx.reply(await listsFunctions.list_add(name, my_note, ctx.guild.id))
     except:
-        await ctx.reply("Invalid command. Usage: list name note")
+        await ctx.reply("Invalid command. Usage: addlist name note")
 
 @bot.command()
-async def listedit(ctx, name:str, id, *note):
+async def editlist(ctx, name:str, id, *note):
     """Edits the note at id in the named list.
-        Usage: listedit name id note"""
+        Usage: editlist name id note"""
     try:
         my_note = " ".join(note)
         if not my_note:
@@ -27,40 +27,32 @@ async def listedit(ctx, name:str, id, *note):
         else:
             await ctx.reply(await listsFunctions.list_edit(name, id, my_note, ctx.guild.id))
     except:
-        await ctx.reply("Invalid command. Usage: listedit name id note")
+        await ctx.reply("Invalid command. Usage: editlist name id note")
 
 @bot.command()
-async def listremove(ctx, name:str, id):
+async def removelist(ctx, name:str, id=-1):
     """Removes the note at id in the named list.
-        Usage: listremove name id"""
+        If no id is provided, remove the named list.
+        Usage: removelist name id"""
     try:
         await ctx.reply(await listsFunctions.list_remove(name, id, ctx.guild.id))
     except:
-        await ctx.reply("Invalid command. Usage: listremove name id")
+        await ctx.reply("Invalid command. Usage: removelist name id")
 
 @bot.command()
-async def listdelete(ctx, name:str):
-    """Deletes the named list.
-        Usage: listdelete name"""
-    try:
-        await ctx.reply(await listsFunctions.list_delete(name, ctx.guild.id))
-    except:
-        await ctx.reply("Invalid command. Usage: listdelete name")
-
-@bot.command()
-async def listclear(ctx):
+async def clearlist(ctx):
     """Delete all lists.
-        Usage: listclear"""
+        Usage: clearlist"""
     try:
         await ctx.reply(await listsFunctions.list_clear(ctx.guild.id))
     except:
-        await ctx.reply("Invalid command. Usage: listclear")
+        await ctx.reply("Invalid command. Usage: clearlist")
 
 @bot.command()
-async def listcheck(ctx, name:str=""):
+async def checklist(ctx, name:str=""):
     """Check the named list. If no name provided, check all lists.
-        Usage: listcheck name(optional)"""
+        Usage: checklist name(optional)"""
     try:
         await ctx.reply(await listsFunctions.list_check(name, ctx.guild.id))
     except:
-        await ctx.reply("Invalid command. Usage: listcheck name(optional)")
+        await ctx.reply("Invalid command. Usage: checklist name(optional)")

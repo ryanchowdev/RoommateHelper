@@ -42,30 +42,28 @@ async def list_edit(name, post_id, note, guild_id):
 async def list_remove(name, post_id, guild_id):
     async with aiosqlite.connect(DBFILE) as db:
         async with db.cursor() as cursor:
-            # Get the post from the list
-            await cursor.execute("SELECT * FROM listsTable WHERE guild = ? AND name = ? AND postid = ?", (guild_id, name, post_id))
-            data = await cursor.fetchone()
-            if data:
-                # Delete post for this list
-                await cursor.execute("DELETE FROM listsTable WHERE guild = ? AND name = ? AND postid = ?", (guild_id, name, post_id))
-                await db.commit()
-                return f"Removed post {post_id} from list: {name}."
+            if post_id == -1:
+                # No post provided, so get the named list
+                await cursor.execute("SELECT * FROM listsTable WHERE guild = ? AND name = ?", (guild_id, name))
+                data = await cursor.fetchall()
+                if data:
+                    # Delete list
+                    await cursor.execute("DELETE FROM listsTable WHERE guild = ? AND name = ?", (guild_id, name))
+                    await db.commit()
+                    return f"Deleted list: {name}."
+                else:
+                    return f"Did not find list: {name}."
             else:
-                return f"Did not find post {post_id} in list: {name}."
-
-async def list_delete(name, guild_id):
-    async with aiosqlite.connect(DBFILE) as db:
-        async with db.cursor() as cursor:
-            # Get named list
-            await cursor.execute("SELECT * FROM listsTable WHERE guild = ? AND name = ?", (guild_id, name))
-            data = await cursor.fetchall()
-            if data:
-                # Delete list
-                await cursor.execute("DELETE FROM listsTable WHERE guild = ? AND name = ?", (guild_id, name))
-                await db.commit()
-            else:
-                return f"Did not find list: {name}."
-    return f"Deleted list: {name}."
+                # Post was provided, so get the post from the list
+                await cursor.execute("SELECT * FROM listsTable WHERE guild = ? AND name = ? AND postid = ?", (guild_id, name, post_id))
+                data = await cursor.fetchone()
+                if data:
+                    # Delete post for this list
+                    await cursor.execute("DELETE FROM listsTable WHERE guild = ? AND name = ? AND postid = ?", (guild_id, name, post_id))
+                    await db.commit()
+                    return f"Removed post {post_id} from list: {name}."
+                else:
+                    return f"Did not find post {post_id} in list: {name}."
 
 async def list_clear(guild_id):
     async with aiosqlite.connect(DBFILE) as db:
