@@ -1,0 +1,21 @@
+import aiosqlite
+import json
+
+def getPlaces(query):
+    """returns a URL with the queried places."""
+    URL = f"https://www.google.com/maps/search/?api=1&query={query}"
+    return URL
+
+def places(args):
+    """
+    replies to the user with the queried places
+    """
+    if len(args) > 1:
+        query = "%20".join(args)
+    else:
+        query = args[0]
+    
+    if query == '':
+        return "Please enter a query by `=places <query>`, ex: =places coffee shop"
+    else:
+        return getPlaces(query)
