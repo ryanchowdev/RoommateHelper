@@ -10,7 +10,7 @@ TAILS = 1
 
 @bot.command()
 async def flip(ctx):
-   
+   """Flips a coin and randomly chooses between heads or tails. Usage: flip"""
    res = random.randint(HEADS,TAILS)
    
    if res == HEADS:

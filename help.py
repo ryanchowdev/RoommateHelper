@@ -38,6 +38,7 @@ switcher = {
 
 @bot.command()
 async def help(ctx,option=""):
+   """Displays various help menus and commands. Usage: help <option (optional)>"""
    number = switcher.get(option)
    
    if number == DEFAULT:
