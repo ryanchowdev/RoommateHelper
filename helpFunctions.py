@@ -323,7 +323,7 @@ def displaySchedulePage():
 
     embed.add_field(
         name="**=schedule <time unit> <amount> “<message>” “list list list” “date”**", 
-        value="Creates a schedule based off the given input. Ex: =schedule m 1 “Take out trash” “@user1 @user2 @user3” “5/4/2022 9:40”", 
+        value="Creates a schedule based off the given input. Ex: =schedule m 1 “Take out trash” “Ryan Timothy Ferdinand Randy Justin” “6/30/3023 16:31”", 
         inline=False
         )
     
