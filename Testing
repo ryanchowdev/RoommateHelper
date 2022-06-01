@@ -15,6 +15,7 @@ List of Tests:
             - Triggers "default" error message for equation
         d. EC: equation that is of typical algebraic format
             - Returns answer to equation
+3. Coin Flip
 4. Google Maps Query
     places() Function Testing
         a. EC: one word string
