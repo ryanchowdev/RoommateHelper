@@ -76,6 +76,7 @@ Alternatively, run the following help commands to display a help menu for the sp
 * pytz==2020.5
 * urllib3==1.26.3
 * youtube_dl==2021.12.17
+* [ffmpeg](https://ffmpeg.org/)
 * [OpenWeatherMap](https://openweathermap.org) API key
 * [Discord Bot](https://discord.com/developers/) API key
 
@@ -86,6 +87,7 @@ Alternatively, run the following help commands to display a help menu for the sp
 git clone https://github.com/ryanchowdev/RoommateHelper.git
 cd ./RoommateHelper
 pip -r requirements.txt
+sudo apt install ffmpeg
 ```
 * Then create a *.env* file with your Discord and [OpenWeatherMap](https://openweathermap.org) API keys like so
 ```
