@@ -1,91 +1,61 @@
-import os
-import pickle
-from pathlib import Path
 from builtins import bot
+import moneyFunctions
 
-def save_to_file(dict, f):
-    debts_file = open(f, 'bw+')
-    pickle.dump(dict, debts_file)
-    debts_file.close()
-
-def load_from_file(f):
-    # create pickle file if it does not exist
-    myfile = Path(f)
-    myfile.touch(exist_ok=True)
-    # load
-    debts_file = open(myfile, 'br')
-    debts = pickle.load(debts_file)
-    debts_file.close()
-    return debts
-
-def record_debt(name, amt):
-    # create pickle file if it does not exist
-    myfile = Path('debts.pkl')
-    myfile.touch(exist_ok=True)
-    # only load from pickle file if it is nonempty
-    debts = load_from_file('debts.pkl') if os.stat('debts.pkl').st_size != 0 else {}
-    debts.update({name: amt})
-    save_to_file(debts, 'debts.pkl')
-
-def my_debt(name):
-    try:
-        if os.stat('debts.pkl').st_size != 0:
-            debts = load_from_file('debts.pkl')
-            return debts[name]
-        else:
-            return -1
-    except:
-        return -1
+DBFILE = "main.db"
 
 @bot.command()
-async def debt(ctx, name:str, amt):
+async def setdebt(ctx, name:str, amt, *note):
+    """Set debt for a person. Usage: setdebt name amt note(optional)"""
     try:
-        amt = float(amt)
+        amt = round(float(amt), 2)
         assert amt > 0
-        rounded_amt = round(amt, 2)
-        record_debt(name, rounded_amt)
-        await ctx.reply(f"Added debt for {name} of amount ${rounded_amt:.2f}.")
+        my_note = " ".join(note) if len(note) > 0 else None
+        await ctx.reply(await moneyFunctions.set_debt(name, amt, my_note, ctx.guild.id))
     except AssertionError:
         await ctx.reply("Debt amount must be positive (>0).")
     except:
-        await ctx.reply("Invalid command. Usage: debt name amount")
+        await ctx.reply("Invalid command. Usage: setdebt name amount note(optional)")
 
 @bot.command()
 async def changedebt(ctx, name:str, amt):
+    """Change debt for a person. Usage: name amt"""
     try:
-        amt = float(amt)
-        rounded_amt = round(amt, 2)
-        current_debt = my_debt(name)
-        new_debt = 0
-        if current_debt == -1:
-            new_debt = max(rounded_amt, 0.00)
-        else:
-            new_debt = max(current_debt + rounded_amt, 0.00) # no negative debt
-        record_debt(name, new_debt)
-        await ctx.reply(f"Adjusted debt for {name} by {rounded_amt:.2f}. New debt: {new_debt:.2f}")
+        amt = round(float(amt), 2)
+        await ctx.reply(await moneyFunctions.change_debt(name, amt, ctx.guild.id))
     except:
         await ctx.reply("Invalid command. Usage: changedebt name amount")
 
 @bot.command()
-async def checkdebt(ctx):
+async def changenote(ctx, name:str, *note):
+    """Change note for a person. Usage: changenote name note"""
+    my_note = " ".join(note)
+    if not my_note:
+        my_note = None
     try:
-        if os.stat('debts.pkl').st_size != 0:
-            message = ""
-            debts = load_from_file('debts.pkl')
-            for key in debts:
-                message += f"{key} owes ${str(debts[key])}.\n"
-            await ctx.reply(f"Current debts:\n{message}")
-        else:
-            await ctx.reply("No current debts.")
+        await ctx.reply(await moneyFunctions.change_note(name, my_note, ctx.guild.id))
     except:
-        await ctx.reply("No current debts.")
+        await ctx.reply("Invalid command. Usage: changenote name note")
+
+@bot.command()
+async def checkdebt(ctx):
+    """Check all debts. Usage: checkdebt"""
+    try:
+        await ctx.reply(await moneyFunctions.check_debt(ctx.guild.id))
+    except:
+        await ctx.reply("Invalid command. Usage: checkdebt")
 
 @bot.command()
 async def cleardebt(ctx):
-    open("debts.pkl", "w").close()
-    await ctx.reply("All debts cleared.")
+    """Clear all debts. Usage: cleardebt"""
+    try:
+        await ctx.reply(await moneyFunctions.clear_debt(ctx.guild.id))
+    except:
+        await ctx.reply("Invalid command. Usage: cleardebt")
 
-# Features to be added
-# Increment/decrement existing debt instead of overwriting with new value
-# Clear debt for individual person
-# Add reason/note for debts
+@bot.command()
+async def removedebt(ctx, name:str):
+    """Remove debt for a person. Usage: removedebt name"""
+    try:
+        await ctx.reply(await moneyFunctions.remove_debt(name, ctx.guild.id))
+    except:
+        await ctx.reply("Invalid command. Usage: removedebt name")
