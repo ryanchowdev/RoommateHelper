@@ -18,7 +18,7 @@ async def alarm(ctx, event:str,date:str, time:str):
   try:
     date_format = datetime.strptime(date, '%m/%d/%Y')
     time_format = datetime.strptime(time, '%H:%M')
-    alarmFunctions.alarm(event, date, time, ctx.guild.id)
+    await alarmFunctions.alarm(event, date, time, ctx.guild.id)
     await ctx.reply(f"Added alarm for {event} on {date} at {time}")
     if not check_time.is_running():
       check_time.start(ctx)
@@ -27,15 +27,15 @@ async def alarm(ctx, event:str,date:str, time:str):
 
 @bot.command()
 async def checkalarm(ctx): 
-  await ctx.reply(alarmFunctions.checkalarm(ctx.guild.id))
+  await ctx.reply(await alarmFunctions.checkalarm(ctx.guild.id))
 
 @bot.command()
 async def clearalarm(ctx):
-  await ctx.reply(alarmFunctions.clearalarm(ctx.guild.id))
+  await ctx.reply(await alarmFunctions.clearalarm(ctx.guild.id))
 
 @bot.command()
 async def removealarm(ctx, event:str):
-  await ctx.reply(alarmFunctions.removealarm(event,ctx.guild.id))    
+  await ctx.reply(await alarmFunctions.removealarm(event,ctx.guild.id))    
 
 
 
@@ -55,7 +55,7 @@ async def check_time(ctx):
                 for i in data:
                   event_date = datetime.strptime(i[2], '%m/%d/%Y')
                   event_date = "%d/%d/%d"%(event_date.month, event_date.day, event_date.year)
-                  if i[2] <= today_date and i[3] <= today_time:
+                  if i[2] <= today_date or (i[2] == today_date and i[3] <= today_time):
                     await ctx.reply(f"{i[1]} starting.")
                     await cursor.execute("DELETE FROM alarmsTable WHERE guild = ? AND event  = ?" ,(ctx.guild.id, i[1]))
                     await db.commit()

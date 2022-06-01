@@ -24,7 +24,7 @@ async def schedule(ctx, paramOne:str ,paramTwo:int, message:str, stringList:str 
         return
     finalTime = scheduleFunctions.dateConversion(dateStart)
     if finalTime == FORMATERROR:
-        await ctx.reply("Error in assigning time. Please use correct format (%Y-%m-%d, %H:%M) /a future time period")
+        await ctx.reply("Error in assigning time. Please use correct format (%Y/%m/%d, %H:%M) /a future time period")
         return 
     await ctx.reply(await scheduleFunctions.insertScheduler(ctx.guild.id,time,finalTime,paramOne,paramTwo,message,stringList))
 
