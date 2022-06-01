@@ -15,8 +15,7 @@ List of Tests:
             - Triggers "default" error message for equation
         d. EC: equation that is of typical algebraic format
             - Returns answer to equation
-3. Coin Flip
-4. Google Maps Query
+3. Google Maps Query
     places() Function Testing
         a. EC: one word string
             Test Case(s): "Cafe", "Museums"
@@ -27,7 +26,7 @@ List of Tests:
         c. EC: empty/null queries
             Test Case(s): "", None, []
             - Trigger error messages for the invalid locations
-5. Help
+4. Help
     help() Function Testing
         a. EC: empty/null
         Test Case(s): " ", "", None
@@ -37,7 +36,7 @@ List of Tests:
             - Display help menu of the specified category
         c. EC: invalid input (anything that isn't a valid category)
             - Triggers "invalid input" error message
-6. Lists
+5. Lists
     a. EC: empty db
         - clear db before each test
         - check empty db after removing all lists
@@ -59,7 +58,7 @@ List of Tests:
         - add to list
         - delete list
         - clear lists
-7. Money
+6. Money
     a. EC: empty db
         - clear db before each test
         - check empty db after removing all debts
@@ -86,7 +85,7 @@ List of Tests:
         - remove debt
     g. EC: try no name provided
         - remove debt
-8. Poll
+7. Poll
     poll() Function Testing
         a. EC: all empty/null strings
         Test Case(s): " ", "", None
@@ -101,7 +100,7 @@ List of Tests:
             - Gives no output
         f. EC: any input with valid votes and options with valid names
             - Displays a poll
-9. Restrict (scheduling)
+8. Restrict (scheduling)
     a. EC: empty db - test_removeChannelSchedule
         - verify db empty
         - add to db and then clear
@@ -116,7 +115,7 @@ List of Tests:
         - check db if channel name already inserted
         - insert new channel name into db
         - check if overwritten
-10. Rules
+9. Rules
     a. EC: empty db - test_clearRules
         - verify db empty
         - add rule then clear rules
@@ -133,7 +132,7 @@ List of Tests:
     e. EC: add multiple rules - test_addMultipleRules
         - add 2 rules of different names
         - check if all rules were properly inserted
-11. Schedule
+10. Schedule
     a. EC: empty db - test_clearSchedulerFunction
         - check empty
         - add to db then clear
@@ -160,7 +159,7 @@ List of Tests:
         - insert a past date into scheduler
         - use function repeatUntilPresentFunction
         - check db to see if date has been updated to current
-12. Weather
+11. Weather
     getWeather() Function Testing
         a. EC: one word city strings
             Test Case(s): "Amsterdam", "London"
