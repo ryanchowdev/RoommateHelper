@@ -52,53 +52,80 @@ List of Tests:
             - Triggers "invalid input" error message
 5. Lists
     a. EC: empty db
-        - clear db before each test
-        - check empty db after removing all lists
+        Test Case: list_clear(TESTID)
+            - clear db before each test
+        Test Case: list_check(TESTID)
+            - check empty db after removing all lists
     b. EC: list exists
-        - add new post to existing list
-        - check list
+        Test Case: list_add('one', '2nd note for one', TESTID)
+            - add new post to existing list
+        Test Case: list_check('eight', TESTID)
+            - check existing list
     c. EC: create new list
-        - add new post to new list
-        - check list
+        Test Case: list_add('one', '1st note for one', TESTID)
+            - add new post to new list
     d. EC: try non-existent post
-        - edit post
-        - remove post
+        Test Case: list_edit('three', 1, '1st note for three', TESTID)
+            - edit post
+        Test Case: list_remove('four', 1, TESTID))
+            - remove post
     e. EC: existing post
-        - edit post
-        - remove post
+        Test Case: list_edit('three', 1, 'edited 1st note for three', TESTID)
+            - edit post
+        Test Case: list_remove('five', -1, TESTID)
+            - remove post
     f. EC: try non-existent list
-        - delete list
+        Test Case: list_remove('five', -1, TESTID)
+            - delete list
     g. EC: existing list
-        - add to list
-        - delete list
-        - clear lists
+        Test Case: list_add('one', '2nd note for one', TESTID)
+            - add to list
+        Test Case: list_remove('four', 1, TESTID)
+            - delete list
+        Test Case: list_clear(TESTID)
+            - clear lists
 6. Money
     a. EC: empty db
-        - clear db before each test
-        - check empty db after removing all debts
+        Test Case: clear_debt(TESTID)
+            - clear db before each test
+        Test Case: clear_debt(TESTID)
+            - check empty db after removing all debts
     b. EC: positive amount
-        - set debt
-        - change debt
+        Test Case: set_debt('one', 1, 'test inserted 1', TESTID)
+            - set debt
+        Test Case: change_debt('three', 10, TESTID)
+            - change debt
+        Test Case: check_debt(TESTID)
         - check debt
     c. EC: negative amount - converted to 0
         - moneyFunctions.set_debt does not have a unittest for this, 
             as we assert the amount is > 0 in the @bot.command() money.setdebt function.
             This is the interface where the user enters commands, so we will never
             allow a negative value here.
-        - change debt
-        - check debt
+        Test Case: change_debt('three', -25, TESTID)
+            - change debt
+        Test Case: check_debt(TESTID)
+            - check debt
     d. EC: no note
-        - set debt
-        - change note
-        - check debt
+        Test Case: set_debt('two', 5.55, None, TESTID)
+            - set debt
+        Test Case: change_note('four', None, TESTID)
+            - change note
+        Test Case: check_debt(TESTID)
+            - check debt
     e. EC: note provided
-        - set debt
-        - change note
+        Test Case: set_debt('one', 1, 'test inserted 1', TESTID)
+            - set debt
+        Test Case: change_note('four', 'Hello World!', TESTID)
+            - change note
+        Test Case: check_debt(TESTID)
         - check debt
-    f. EC: name provided
-        - remove debt
-    g. EC: try no name provided
-        - remove debt
+    f. EC: non existent entry in db
+        Test Case: remove_debt('nine', TESTID)
+            - remove debt
+    g. EC: entry exists in db
+        Test Case: remove_debt('nine', TESTID)
+            - remove debt
 7. Poll
     poll() Function Testing
         a. EC: all empty/null strings

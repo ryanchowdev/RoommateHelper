@@ -67,5 +67,6 @@ async def help(ctx,option=""):
       embed=helpFunctions.displayWeatherPage()
    elif number == LISTS:
       embed=helpFunctions.displayListsPage()
-      
+   else:
+      await ctx.send(":no_entry: Invalid Input: Please select a valid category")
    await ctx.send(embed=embed)

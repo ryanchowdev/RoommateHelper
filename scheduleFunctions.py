@@ -109,11 +109,17 @@ async def repeatUntilPresentFunction(id):
 
 # Deletes from db based on scheduling id and server id
 async def deleteScheduleFunction(Gid,id):
+    res = "DELETED SCHEDULE"
     async with aiosqlite.connect("main.db") as db:
         async with db.cursor() as cursor:
-            await cursor.execute("DELETE FROM schedulesTable WHERE guild = ? AND id = ?",(Gid,id))
+            await cursor.execute("SELECT * from schedulesTable WHERE guild = ? AND id = ?",(Gid,id))
+            data = await cursor.fetchone()
+            if data:
+                await cursor.execute("DELETE FROM schedulesTable WHERE guild = ? AND id = ?",(Gid,id))
+            else:
+                res =  "NO SUCH SCHEDULE ID"
         await db.commit()
-    return "DELETED SCHEDULE"
+    return res
 
 # Deletes from db based on server id
 async def clearScheduleFunction(id):

@@ -10,11 +10,11 @@ async def setCity(ctx):
     """
     cmd = ctx.message.content.split(" ")
     if len(cmd) == 1:
-        return "Usage:\n`=setCity <city>`"
+        await ctx.reply( "Usage:\n`=setCity <city>`")
     else:
         city = " ".join(cmd[1:])
-    msg = await weatherFunctions.setCity(city, ctx.guild.id)
-    await ctx.reply(msg)
+        msg = await weatherFunctions.setCity(city, ctx.guild.id)
+        await ctx.reply(msg)
 
 @bot.command()
 async def setUnits(ctx):

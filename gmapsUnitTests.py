@@ -18,10 +18,11 @@ class GmapsTests(IsolatedAsyncioTestCase):
 
   # Testing invalid places input
   def test_gmaps_invalidPlace(self):
-    place = ''
-    response = gmapsFunctions.places([place])
-    expected_response = "Please enter a query by `=places <query>`, ex: =places coffee shop"
-    self.assertEqual(expected_response, response)
+    places = ["", None, []]
+    for place in places:
+      response = gmapsFunctions.places(place)
+      expected_response = "Please enter a query by `=places <query>`, ex: =places coffee shop"
+      self.assertEqual(expected_response, response)
 
 if __name__ == '__main__':
     unittest.main()

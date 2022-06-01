@@ -28,9 +28,6 @@ class ScheduleTests(IsolatedAsyncioTestCase):
                 await cursor.execute("SELECT alarmTime FROM schedulesTable WHERE guild = ? AND message = ?", (guild_id, name))
                 return await cursor.fetchone()  
 
-    def test(self):
-        self.assertTrue(True)
-
     def test_convertToMinutes(self):
         self.assertEqual(-1,scheduleFunctions.convertToMinutes("adasdas", 1))
         self.assertEqual(1,scheduleFunctions.convertToMinutes("m", 1))
@@ -38,7 +35,7 @@ class ScheduleTests(IsolatedAsyncioTestCase):
         self.assertEqual(20160,scheduleFunctions.convertToMinutes("week", 2))
 
     def test_dateConversion(self):
-        self.assertEqual( datetime.strptime(datetime.now().strftime("%Y-%m-%d, %H:%M"),"%Y-%m-%d, %H:%M"),scheduleFunctions.dateConversion(""))
+        self.assertEqual( datetime.strptime(datetime.now().strftime("%Y/%m/%d, %H:%M"),"%Y/%m/%d, %H:%M"),scheduleFunctions.dateConversion(""))
         self.assertEqual(-1,scheduleFunctions.dateConversion(None))
         self.assertEqual(-1,scheduleFunctions.dateConversion("5-16-2022 13:01"))
 
@@ -48,6 +45,10 @@ class ScheduleTests(IsolatedAsyncioTestCase):
         self.assertEqual(1,await scheduleFunctions.getScheduleNum(TESTID))
         self.assertEqual((1, 5, '5-16-2022 13:01', 0, 'MESSAGE', ''), await self.check_db_entry(TESTID, 'MESSAGE'))
         await scheduleFunctions.clearScheduleFunction(TESTID)
+
+    async def test_deleteScheduleFunctionNone(self):
+        await scheduleFunctions.clearScheduleFunction(TESTID)
+        self.assertEqual("NO SUCH SCHEDULE ID",await scheduleFunctions.deleteScheduleFunction(TESTID,1))
 
     async def test_clearSchedulerFunction(self):
         await scheduleFunctions.clearScheduleFunction(TESTID)
