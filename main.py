@@ -12,7 +12,7 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 
 #variables
 PREFIX = '='
-bot = commands.Bot(command_prefix=PREFIX)
+bot = commands.Bot(command_prefix=PREFIX, help_command=None, case_insensitive=True)
 
 builtins.bot = bot
 
@@ -30,6 +30,7 @@ import tables
 import restrict
 import music
 import gmaps
+import lists
 
 @bot.event
 async def on_ready():
@@ -39,6 +40,8 @@ async def on_ready():
     print("Creating database tables now...\n")
     await tables.create_tables()
     print("Tables created.\n")
+    await schedule.scheduledMessage.start()
+    print("Scheduler is now active")
 
 @bot.command()
 async def hello(ctx):
