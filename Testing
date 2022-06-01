@@ -1,0 +1,67 @@
+List of Tests:
+1. Alarm
+    -
+    -
+    -
+2. Calculator
+    -
+    -
+    -
+3. Coin Flip
+4. Google Maps
+5. Help
+6. Lists
+    a. EC: empty db
+        - clear db before each test
+        - check empty db after removing all lists
+    b. EC: list exists
+        - add new post to existing list
+        - check list
+    c. EC: create new list
+        - add new post to new list
+        - check list
+    d. EC: try non-existent post
+        - edit post
+        - remove post
+    e. EC: existing post
+        - edit post
+        - remove post
+    f. EC: try non-existent list
+        - delete list
+    g. EC: existing list
+        - add to list
+        - delete list
+        - clear lists
+7. Money
+    a. EC: empty db
+        - clear db before each test
+        - check empty db after removing all debts
+    b. EC: positive amount
+        - set debt
+        - change debt
+        - check debt
+    c. EC: negative amount - converted to 0
+        - moneyFunctions.set_debt does not have a unittest for this, 
+            as we assert the amount is > 0 in the @bot.command() money.setdebt function.
+            This is the interface where the user enters commands, so we will never
+            allow a negative value here.
+        - change debt
+        - check debt
+    d. EC: no note
+        - set debt
+        - change note
+        - check debt
+    e. EC: note provided
+        - set debt
+        - change note
+        - check debt
+    f. EC: name provided
+        - remove debt
+    g. EC: try no name provided
+        - remove debt
+8. Music
+9. Poll
+10. Restrict
+11. Rules
+12. Schedule
+13. Weather
