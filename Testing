@@ -8,7 +8,17 @@ List of Tests:
     -
     -
 3. Coin Flip
-4. Google Maps
+4. Google Maps Query
+    places() Function Testing
+        a. EC: one word string
+            Test Case(s): "Cafe", "Museums"
+            - Generate query for the specified locations
+        b. EC: multiple word string
+            Test Case(s): "Mexican Food"
+            - Generate query for the specified location
+        c. EC: empty/null queries
+            Test Case(s): "", None, []
+            - Trigger error messages for the invalid locations
 5. Help
 6. Lists
     a. EC: empty db
@@ -117,3 +127,93 @@ List of Tests:
         - use function repeatUntilPresentFunction
         - check db to see if date has been updated to current
 12. Weather
+    getWeather() Function Testing
+        a. EC: one word city strings
+            Test Case(s): "Amsterdam", "London"
+            - Get weather in specified city
+        b. EC: multiple word city strings
+            Test Case(s): "New York"
+            - Get weather in specified city
+        c. EC: verbose city string
+            Test Case(s): "Santa Cruz, CA, USA"
+            - Get weather in specified city
+        d. EC: nonexistent city string
+            Test Case(s): "Fake City"
+            - Trigger error messages for the invalid city
+        e. EC: empty/null city strings
+            Test Case(s): " ", "", None
+            - Trigger error messages for the invalid city
+        f. EC: valid unit systems
+            Test Case(s): "imperial", "metric"
+            - Get weather in specified unit system
+        g. EC: nonexistent unit systems 
+            Test Case(s): "fake_system"
+            - Trigger error message for invalid unit system
+        h. EC: empty/null unit systems
+            Test Case(s): " ", "", None
+            - Trigger error message for invalid unit system
+        i. EC: valid OpenWeatherMap API Key (generated from openweathermap.org)
+            Test Case(s): "REDACTED"
+            - Get weather data using the specified API key
+        j. EC: invalid OpenWeatherMap API Key
+            Test Case(s): "invalid_key"
+            - Trigger error message for invalid API Key
+        k. EC: empty/null OpenWeatherMap API Key
+            Test Case(s): None, " ", ""
+            - Trigger error message for empty/null API key
+    setCity() Function Testing
+        a. EC: one word city strings
+            Test Case(s): "Amsterdam", "London"
+            - Set and save city in the database
+        b. EC: multiple word city strings
+            Test Case(s): "New York"
+            - Set and save city in the database
+        c. EC: empty/null city strings
+            Test Case(s): " ", "", None
+            - Trigger error messages for the invalid city
+        d. EC: valid Discord guild ID (any integer >= 1)
+            Test Case(s): 1
+            - Set and save city in the database for the specified Discord guild
+        e. EC: invalid Discord guild ID
+            Test Case(s): 0, -1, "invalid_guild_id"
+            - Trigger error messages for the invalid guild ID
+        f. EC: empty/null Discord guild ID
+            Test Case(s): None, " ", ""
+            - Trigger error messages for the invalid guild ID
+     setUnits() Function Testing
+        a. EC: valid unit systems
+            Test Case(s): "imperial", "metric"
+            - Set and save unit system in the database
+        b. EC: nonexistent unit systems 
+            Test Case(s): "fake_system"
+            - Trigger error message for invalid unit system
+        c. EC: empty/null unit systems
+            Test Case(s): " ", "", None
+            - Trigger error message for invalid unit system
+        d. EC: valid Discord guild ID (any integer >= 1)
+            Test Case(s): 1
+            - Set and save city in the database for the specified Discord guild
+        e. EC: invalid Discord guild ID
+            Test Case(s): 0, -1, "invalid_guild_id"
+            - Trigger error messages for the invalid guild ID
+        f. EC: empty/null Discord guild ID
+            Test Case(s): None, " ", ""
+            - Trigger error messages for the invalid guild ID
+    weather() Function Testing
+        a. EC: valid Discord guild ID (any integer >= 1)
+            Test Case(s): 1
+            - Save the city for the specified guild ID in the database
+            - Get the weather for the city stored under the specified guild ID
+        b. EC: invalid Discord guild ID
+            Test Case(s): -1
+            - Trigger error messages for the invalid guild ID
+        c. EC: valid Discord guild ID with no saved city
+            Test Case(s): UNIX_TIMESTAMP
+            - Generate UNIX_TIMESTAMP to use as a new, mock guild ID
+            - Trigger error message since guild ID has no saved city
+        d. EC: valid OpenWeatherMap API Key (generated from openweathermap.org)
+            Test Case(s): "REDACTED"
+            - Get weather data using the specified API key
+        e. EC: invalid OpenWeatherMap API Key
+            Test Case(s): "invalid_weather_key"
+            - Trigger error message for invalid API Key
