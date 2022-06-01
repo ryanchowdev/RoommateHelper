@@ -59,9 +59,61 @@ List of Tests:
         - remove debt
     g. EC: try no name provided
         - remove debt
-8. Music
-9. Poll
-10. Restrict
-11. Rules
-12. Schedule
-13. Weather
+8. Poll
+9. Restrict (scheduling)
+    a. EC: empty db
+        - clear db before each test
+        - check empty db after removing channel restriction
+    b. EC: channel does not exist 
+        - no unit test for this in restrictUnitTests as this requires info from an @bot.command() function
+    c. EC: no channel
+        - empty db
+        - insert channel name into db
+        - check db if channel name inserted
+    c. EC: channel provided
+        - check db if channel name already inserted
+        - insert new channel name into db
+        - check if overwritten
+10. Rules
+    a. EC: empty db
+        - clear db before each test
+        - check empty db after removing all rules
+    b. EC: no rules
+        - add rule
+        - check rule
+    c. EC: rule exists
+        - insert rule
+        - attempt to insert the same rule
+    d. EC: getRules
+        - insert rule
+        - check if rule is gotten
+    e. EC: add multiple rules
+        - add 2 rules of different names
+        - check if all rules were properly inserted
+11. Schedule
+    a. EC: empty db
+        -clear db before each test
+        -check empty db after removing all schedules
+    b. EC: convert parameters 
+        - insert parameters into convertToMinutes
+        - verify correct outcome
+    c. EC: convert date
+        - insert dates into date conversion
+        - verify correct format goes through while incorrect fails
+    d. EC: insert scheduler
+        - insert schedule into db
+        - verify schedule inserted
+    e. EC: no schedule - get schedule
+        - verify output
+    f. EC: schedule - get schedule
+        - Cannot do so as the current way schedules id are set is that they use a random number
+    g. EC: schedule - delete schedule no id
+        - delete schedule of a false id
+        - verify error output
+    h. EC: schedule - delete schedule id
+        - not implemented as schedule ids utilize a random id
+    i. EC: repeat until present
+        - insert a past date into scheduler
+        - use function repeatUntilPresentFunction
+        - check db to see if date has been updated to current
+12. Weather

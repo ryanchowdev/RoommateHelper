@@ -49,6 +49,10 @@ class ScheduleTests(IsolatedAsyncioTestCase):
         self.assertEqual((1, 5, '5-16-2022 13:01', 0, 'MESSAGE', ''), await self.check_db_entry(TESTID, 'MESSAGE'))
         await scheduleFunctions.clearScheduleFunction(TESTID)
 
+    async def test_deleteScheduleFunctionNone(self):
+        await scheduleFunctions.clearScheduleFunction(TESTID)
+        self.assertEqual("NO SUCH SCHEDULE ID",await scheduleFunctions.deleteScheduleFunction(TESTID,1))
+
     async def test_clearSchedulerFunction(self):
         await scheduleFunctions.clearScheduleFunction(TESTID)
         self.assertEqual(0,await scheduleFunctions.getScheduleNum(TESTID))
