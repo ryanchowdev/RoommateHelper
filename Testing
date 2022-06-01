@@ -1,16 +1,56 @@
 List of Tests:
 1. Alarm
-    -
-    -
-    -
+    a. EC: empty db - test_clearalarm
+        - verify db empty
+        - add alarm then clear alarm
+        - verify db empty
+    b. EC: remove alarm - test_removealarm
+        - add alarm
+        - check alarm list
+        - remove alarm
+        - check alarm list 
+    c. EC: check alarm - test_checkalarm
+        - add alarm
+        - check alarm list
+    d. EC: add multiple alarms - test_alarm
+        - add an alarm
+        - check alarm list
+        - add a different alarm
+        - check alarm list
 2. Calculator
-    -
-    -
-    -
-3. Coin Flip
-4. Google Maps
-5. Help
-6. Lists
+    calc() Function Testing
+        a. EC: empty/null equation strings
+        Test Case(s): " ", "", None
+            - Triggers "no input" error message for equation
+        b. EC: equation that has letters
+        Test Case(s): "x+1", "test"
+            - Triggers "invalid letters" error message for equation
+        c. EC: equation has only letters and symbols, but is still invalid
+            - Triggers "default" error message for equation
+        d. EC: equation that is of typical algebraic format
+            - Returns answer to equation
+3. Google Maps Query
+    places() Function Testing
+        a. EC: one word string
+            Test Case(s): "Cafe", "Museums"
+            - Generate query for the specified locations
+        b. EC: multiple word string
+            Test Case(s): "Mexican Food"
+            - Generate query for the specified location
+        c. EC: empty/null queries
+            Test Case(s): "", None, []
+            - Trigger error messages for the invalid locations
+4. Help
+    help() Function Testing
+        a. EC: empty/null
+        Test Case(s): " ", "", None
+            - Displays help menu with all categories
+        b. EC: valid category
+        Test Case(s): "coinflip, "polls"
+            - Display help menu of the specified category
+        c. EC: invalid input (anything that isn't a valid category)
+            - Triggers "invalid input" error message
+5. Lists
     a. EC: empty db
         - clear db before each test
         - check empty db after removing all lists
@@ -32,7 +72,7 @@ List of Tests:
         - add to list
         - delete list
         - clear lists
-7. Money
+6. Money
     a. EC: empty db
         - clear db before each test
         - check empty db after removing all debts
@@ -59,9 +99,168 @@ List of Tests:
         - remove debt
     g. EC: try no name provided
         - remove debt
-8. Music
-9. Poll
-10. Restrict
-11. Rules
-12. Schedule
-13. Weather
+7. Poll
+    poll() Function Testing
+        a. EC: all empty/null strings
+        Test Case(s): " ", "", None
+            - Display default help menu for polls
+        b. EC: any string with a vote of 0 or less
+            - Triggers "number of votes need to be greater than 0" error message
+        c. EC: any string with a valid number of votes but with mismatch in number of options
+            - Triggers "vote mismatch" error message
+        d. EC: any string with more than 10 votes
+            - Triggers "number of votes exceeded" error message
+        e. EC: any string with vote not an integer
+            - Gives no output
+        f. EC: any input with valid votes and options with valid names
+            - Displays a poll
+8. Restrict (scheduling)
+    a. EC: empty db - test_removeChannelSchedule
+        - verify db empty
+        - add to db and then clear
+        - verify db empty
+    b. EC: channel does not exist 
+        - no unit test for this in restrictUnitTests as this requires info from an @bot.command() function
+    c. EC: no channel - test_restrictChannelSchedule
+        - empty db
+        - insert channel name into db
+        - check db if channel name inserted
+    c. EC: channel provided - test_restrictChannelScheduleExist
+        - check db if channel name already inserted
+        - insert new channel name into db
+        - check if overwritten
+9. Rules
+    a. EC: empty db - test_clearRules
+        - verify db empty
+        - add rule then clear rules
+        - verify db empty
+    b. EC: no rules - test_addRule
+        - add rule
+        - check rule
+    c. EC: rule exists - test_addRuleExist
+        - insert rule
+        - attempt to insert the same rule
+    d. EC: getRules - test_getRules
+        - insert rule
+        - check if rule is gotten
+    e. EC: add multiple rules - test_addMultipleRules
+        - add 2 rules of different names
+        - check if all rules were properly inserted
+10. Schedule
+    a. EC: empty db - test_clearSchedulerFunction
+        - check empty
+        - add to db then clear
+        - verify db empty
+    b. EC: convert parameters - test_convertToMinutes
+        - insert parameters into convertToMinutes
+        - verify correct outcome
+    c. EC: convert date - test_dateConversion
+        - insert dates into date conversion
+        - verify correct format goes through while incorrect fails
+    d. EC: insert scheduler - test_insertScheduler
+        - insert schedule into db
+        - verify schedule inserted
+    e. EC: no schedule - get schedule - test_getSchedulerFunction
+        - verify output
+    f. EC: schedule - get schedule
+        - Cannot do so as the current way schedules id are set is that they use a random number
+    g. EC: schedule - delete schedule no id - test_deleteScheduleFunctionNone
+        - delete schedule of a false id
+        - verify error output
+    h. EC: schedule - delete schedule id 
+        - not implemented as schedule ids utilize a random id
+    i. EC: repeat until present - test_repeatUntilPresentFunction
+        - insert a past date into scheduler
+        - use function repeatUntilPresentFunction
+        - check db to see if date has been updated to current
+11. Weather
+    getWeather() Function Testing
+        a. EC: one word city strings
+            Test Case(s): "Amsterdam", "London"
+            - Get weather in specified city
+        b. EC: multiple word city strings
+            Test Case(s): "New York"
+            - Get weather in specified city
+        c. EC: verbose city string
+            Test Case(s): "Santa Cruz, CA, USA"
+            - Get weather in specified city
+        d. EC: nonexistent city string
+            Test Case(s): "Fake City"
+            - Trigger error messages for the invalid city
+        e. EC: empty/null city strings
+            Test Case(s): " ", "", None
+            - Trigger error messages for the invalid city
+        f. EC: valid unit systems
+            Test Case(s): "imperial", "metric"
+            - Get weather in specified unit system
+        g. EC: nonexistent unit systems 
+            Test Case(s): "fake_system"
+            - Trigger error message for invalid unit system
+        h. EC: empty/null unit systems
+            Test Case(s): " ", "", None
+            - Trigger error message for invalid unit system
+        i. EC: valid OpenWeatherMap API Key (generated from openweathermap.org)
+            Test Case(s): "REDACTED"
+            - Get weather data using the specified API key
+        j. EC: invalid OpenWeatherMap API Key
+            Test Case(s): "invalid_key"
+            - Trigger error message for invalid API Key
+        k. EC: empty/null OpenWeatherMap API Key
+            Test Case(s): None, " ", ""
+            - Trigger error message for empty/null API key
+    setCity() Function Testing
+        a. EC: one word city strings
+            Test Case(s): "Amsterdam", "London"
+            - Set and save city in the database
+        b. EC: multiple word city strings
+            Test Case(s): "New York"
+            - Set and save city in the database
+        c. EC: empty/null city strings
+            Test Case(s): " ", "", None
+            - Trigger error messages for the invalid city
+        d. EC: valid Discord guild ID (any integer >= 1)
+            Test Case(s): 1
+            - Set and save city in the database for the specified Discord guild
+        e. EC: invalid Discord guild ID
+            Test Case(s): 0, -1, "invalid_guild_id"
+            - Trigger error messages for the invalid guild ID
+        f. EC: empty/null Discord guild ID
+            Test Case(s): None, " ", ""
+            - Trigger error messages for the invalid guild ID
+     setUnits() Function Testing
+        a. EC: valid unit systems
+            Test Case(s): "imperial", "metric"
+            - Set and save unit system in the database
+        b. EC: nonexistent unit systems 
+            Test Case(s): "fake_system"
+            - Trigger error message for invalid unit system
+        c. EC: empty/null unit systems
+            Test Case(s): " ", "", None
+            - Trigger error message for invalid unit system
+        d. EC: valid Discord guild ID (any integer >= 1)
+            Test Case(s): 1
+            - Set and save city in the database for the specified Discord guild
+        e. EC: invalid Discord guild ID
+            Test Case(s): 0, -1, "invalid_guild_id"
+            - Trigger error messages for the invalid guild ID
+        f. EC: empty/null Discord guild ID
+            Test Case(s): None, " ", ""
+            - Trigger error messages for the invalid guild ID
+    weather() Function Testing
+        a. EC: valid Discord guild ID (any integer >= 1)
+            Test Case(s): 1
+            - Save the city for the specified guild ID in the database
+            - Get the weather for the city stored under the specified guild ID
+        b. EC: invalid Discord guild ID
+            Test Case(s): -1
+            - Trigger error messages for the invalid guild ID
+        c. EC: valid Discord guild ID with no saved city
+            Test Case(s): UNIX_TIMESTAMP
+            - Generate UNIX_TIMESTAMP to use as a new, mock guild ID
+            - Trigger error message since guild ID has no saved city
+        d. EC: valid OpenWeatherMap API Key (generated from openweathermap.org)
+            Test Case(s): "REDACTED"
+            - Get weather data using the specified API key
+        e. EC: invalid OpenWeatherMap API Key
+            Test Case(s): "invalid_weather_key"
+            - Trigger error message for invalid API Key
