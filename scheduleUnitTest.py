@@ -35,7 +35,7 @@ class ScheduleTests(IsolatedAsyncioTestCase):
         self.assertEqual(20160,scheduleFunctions.convertToMinutes("week", 2))
 
     def test_dateConversion(self):
-        self.assertEqual( datetime.strptime(datetime.now().strftime("%Y-%m-%d, %H:%M"),"%Y-%m-%d, %H:%M"),scheduleFunctions.dateConversion(""))
+        self.assertEqual( datetime.strptime(datetime.now().strftime("%Y/%m/%d, %H:%M"),"%Y/%m/%d, %H:%M"),scheduleFunctions.dateConversion(""))
         self.assertEqual(-1,scheduleFunctions.dateConversion(None))
         self.assertEqual(-1,scheduleFunctions.dateConversion("5-16-2022 13:01"))
 
