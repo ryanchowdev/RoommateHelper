@@ -7,6 +7,7 @@ import aiosqlite
 DBFILE = "main.db"
 TESTID = 1 #Going under assumption that no discord server has guild id of TESTID
 EXPECTEDRULES = 1
+FIRSTINDEX = 0
 
 class RulesTests(IsolatedAsyncioTestCase):
 
@@ -20,7 +21,7 @@ class RulesTests(IsolatedAsyncioTestCase):
     async def test_addRule(self):
         await rulesFunctions.clearRulesCommand(TESTID)
         await rulesFunctions.addRuleCommand(TESTID,"TEST RULE")
-        self.assertEqual("TEST RULE",(await self.check_db_entry(TESTID))[0])
+        self.assertEqual("TEST RULE",(await self.check_db_entry(TESTID))[FIRSTINDEX])
         await rulesFunctions.clearRulesCommand(TESTID)
 
     async def test_addRuleExist(self):
