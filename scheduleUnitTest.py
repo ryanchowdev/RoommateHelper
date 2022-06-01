@@ -28,9 +28,6 @@ class ScheduleTests(IsolatedAsyncioTestCase):
                 await cursor.execute("SELECT alarmTime FROM schedulesTable WHERE guild = ? AND message = ?", (guild_id, name))
                 return await cursor.fetchone()  
 
-    def test(self):
-        self.assertTrue(True)
-
     def test_convertToMinutes(self):
         self.assertEqual(-1,scheduleFunctions.convertToMinutes("adasdas", 1))
         self.assertEqual(1,scheduleFunctions.convertToMinutes("m", 1))
