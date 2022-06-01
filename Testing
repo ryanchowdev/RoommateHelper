@@ -4,9 +4,17 @@ List of Tests:
     -
     -
 2. Calculator
-    -
-    -
-    -
+    calc() Function Testing
+        a. EC: empty/null equation strings
+        Test Case(s): " ", "", None
+            - Triggers "no input" error message for equation
+        b. EC: equation that has letters
+        Test Case(s): "x+1", "test"
+            - Triggers "invalid letters" error message for equation
+        c. EC: equation has only letters and symbols, but is still invalid
+            - Triggers "default" error message for equation
+        d. EC: equation that is of typical algebraic format
+            - Returns answer to equation
 3. Coin Flip
 4. Google Maps Query
     places() Function Testing
@@ -20,6 +28,15 @@ List of Tests:
             Test Case(s): "", None, []
             - Trigger error messages for the invalid locations
 5. Help
+    help() Function Testing
+        a. EC: empty/null
+        Test Case(s): " ", "", None
+            - Displays help menu with all categories
+        b. EC: valid category
+        Test Case(s): "coinflip, "polls"
+            - Display help menu of the specified category
+        c. EC: invalid input (anything that isn't a valid category)
+            - Triggers "invalid input" error message
 6. Lists
     a. EC: empty db
         - clear db before each test
@@ -70,6 +87,20 @@ List of Tests:
     g. EC: try no name provided
         - remove debt
 8. Poll
+    poll() Function Testing
+        a. EC: all empty/null strings
+        Test Case(s): " ", "", None
+            - Display default help menu for polls
+        b. EC: any string with a vote of 0 or less
+            - Triggers "number of votes need to be greater than 0" error message
+        c. EC: any string with a valid number of votes but with mismatch in number of options
+            - Triggers "vote mismatch" error message
+        d. EC: any string with more than 10 votes
+            - Triggers "number of votes exceeded" error message
+        e. EC: any string with vote not an integer
+            - Gives no output
+        f. EC: any input with valid votes and options with valid names
+            - Displays a poll
 9. Restrict (scheduling)
     a. EC: empty db - test_removeChannelSchedule
         - verify db empty
