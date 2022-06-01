@@ -1,8 +1,22 @@
 List of Tests:
 1. Alarm
-    -
-    -
-    -
+    a. EC: empty db - test_clearalarm
+        - verify db empty
+        - add alarm then clear alarm
+        - verify db empty
+    b. EC: remove alarm - test_removealarm
+        - add alarm
+        - check alarm list
+        - remove alarm
+        - check alarm list 
+    c. EC: check alarm - test_checkalarm
+        - add alarm
+        - check alarm list
+    d. EC: add multiple alarms - test_alarm
+        - add an alarm
+        - check alarm list
+        - add a different alarm
+        - check alarm list
 2. Calculator
     calc() Function Testing
         a. EC: empty/null equation strings
